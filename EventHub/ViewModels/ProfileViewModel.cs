@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EventHub.Data;
+using EventHub.Models;
 using EventHub.Services;
 using EventHub.Shared.Dtos;
 using EventHub.Utils;
@@ -19,15 +20,16 @@ namespace EventHub.ViewModels
         private readonly DatabaseContext _context;
         private readonly HttpClient _httpClient;
 
-
         [ObservableProperty]
         private string _email;
+        
         [ObservableProperty]
-        private bool isLoggedIn;
+        private bool _isLoggedIn;
+        
         [ObservableProperty, NotifyPropertyChangedFor(nameof(Initials))]
         private string _name = "Not Logged In";
 
-        public string Initials => string.IsNullOrEmpty(Name) ? "" : $"{Name[0]}{Name[1]}".ToUpper();
+        public string Initials => string.IsNullOrEmpty(Name) ? string.Empty : Name.Substring(0, 1).ToUpper();
 
         public ProfileViewModel(AuthService authService, DatabaseContext context, HttpClient httpClient)
         {
@@ -35,31 +37,40 @@ namespace EventHub.ViewModels
             _context = context;
             _httpClient = httpClient;
 
+            // Subscribe to authentication state changes
+            _authService.UserLoggedIn += OnUserLoggedIn;
+            _authService.UserLoggedOut += OnUserLoggedOut;
+
+            // Load initial state
             LoadUserData();
         }
 
+        private void OnUserLoggedIn(object sender, LoggedInUser user)
+        {
+            IsLoggedIn = true;
+            Name = user.Name;
+            Email = user.Email;
+        }
 
-       
-
-
+        private void OnUserLoggedOut(object sender, EventArgs e)
+        {
+            IsLoggedIn = false;
+            Name = "Not Logged In";
+            Email = string.Empty;
+        }
 
         [RelayCommand]
         private async Task LoginLogoutAsync()
         {
-          if (!IsLoggedIn)
+            if (!IsLoggedIn)
             {
-              await Shell.Current.GoToAsync($"//{nameof(AuthPage)}");
+                await Shell.Current.GoToAsync($"//{nameof(AuthPage)}");
             }
             else
             {
-              await _authService.LogoutAsync();
-                IsLoggedIn = false;
-                Name = "Not Logged In";
-                                                                                                                                                               
-
+                await _authService.LogoutAsync();
             }
         }
-
 
         private void LoadUserData()
         {
@@ -77,9 +88,5 @@ namespace EventHub.ViewModels
                 Email = string.Empty;
             }
         }
-
-
-
-
     }
 }

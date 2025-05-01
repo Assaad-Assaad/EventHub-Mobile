@@ -9,11 +9,9 @@ namespace EventHub.ViewModels
         [ObservableProperty]
         private bool _isBusy;
 
-
-
-        protected async Task RunBusyActionAsync(Func<Task> action, string errorMessage = "Something went wrong.")
+        protected async Task RunBusyActionAsync(Func<Task> action, string errorMessage = "Something went wrong.", bool requireOnline = false)
         {
-            if (!IsOnline())
+            if (requireOnline && !IsOnline())
             {
                 await ShowAlertAsync("No Internet", "An internet connection is required.", "OK");
                 return;
@@ -38,9 +36,9 @@ namespace EventHub.ViewModels
             }
         }
 
-        protected async Task<T> RunBusyFunctionAsync<T>(Func<Task<T>> action, string errorMessage = "Something went wrong.")
+        protected async Task<T> RunBusyFunctionAsync<T>(Func<Task<T>> action, string errorMessage = "Something went wrong.", bool requireOnline = false)
         {
-            if (!IsOnline())
+            if (requireOnline && !IsOnline())
             {
                 await ShowAlertAsync("No Internet", "An internet connection is required.", "OK");
                 return default;
@@ -66,23 +64,21 @@ namespace EventHub.ViewModels
             }
         }
 
+        public bool IsOnline() => Connectivity.Current.NetworkAccess == NetworkAccess.Internet;
 
-        protected bool IsOnline() => Connectivity.Current.NetworkAccess == NetworkAccess.Internet;
+        protected async Task ShowAlertAsync(string title, string message, string cancel)
+        {
+            await Shell.Current.DisplayAlert(title, message, cancel);
+        }
 
+        public async Task ShowToastAsync(string message)
+        {
+            await Toast.Make(message).Show();
+        }
 
-        protected async Task ShowToastAsync(string message) => await Toast.Make(message).Show();
+        
 
-
-
-        protected async Task ShowAlertAsync(string title, string message, string buttonText) =>
-            await Shell.Current.DisplayAlert(title, message, buttonText);
-
-
-        protected async Task<bool> ShowConfirmAsync(string title, string message, string okButtonText, string cancelButtonText) =>
+        public async Task<bool> ShowConfirmAsync(string title, string message, string okButtonText, string cancelButtonText) =>
             await Shell.Current.DisplayAlert(title, message, okButtonText, cancelButtonText);
-
-
-
     }
-
 }

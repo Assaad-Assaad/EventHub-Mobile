@@ -1,9 +1,21 @@
+using EventHub.ViewModels.Event;
+
 namespace EventHub.Views.Event;
 
 public partial class MyEventsPage : ContentPage
 {
-	public MyEventsPage()
+	private readonly MyEventsViewModel _myEventsViewModel;
+    public MyEventsPage(MyEventsViewModel myEventsViewModel)
 	{
 		InitializeComponent();
-	}
+        _myEventsViewModel = myEventsViewModel;
+        BindingContext = _myEventsViewModel;
+    }
+
+
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+        await _myEventsViewModel.LoadEventsAsync();
+    }
 }

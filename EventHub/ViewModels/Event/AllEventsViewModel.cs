@@ -69,7 +69,7 @@ namespace EventHub.ViewModels.Event
                 }
 
                 NoEventsAvailable = filteredEvents?.Count == 0;
-            }); 
+            }, requireOnline: false);
         }
 
 

@@ -20,8 +20,5 @@ public partial class HomePage : ContentPage
     }
 
 
-    private async void OnBackClicked(object sender, EventArgs e)
-    {
-        await Shell.Current.GoToAsync($"//{nameof(AuthPage)}");
-    }
+   
 }

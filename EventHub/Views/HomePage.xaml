@@ -11,11 +11,14 @@
 
     <Grid RowDefinitions="Auto, 225, Auto, *" Padding="10">
         <FlexLayout Grid.Row="0" JustifyContent="SpaceBetween" Padding="0, 0, 10, 10">
-            <ImageButton Source="left_arrow.png"
-                         BackgroundColor="Transparent"
-                         Clicked="OnBackClicked"/>
+            <Label Text="Welcome" 
+                 FontSize="20"
+                 FontAttributes="Bold"
+                 TextColor="{StaticResource Primary}"
+                 VerticalOptions="Center"
+                 HorizontalOptions="Start"/>
 
-            <Label Text="{Binding WelcomeMessage}" 
+            <Label Text="{Binding Name}" 
                  FontSize="20"
                  FontAttributes="Bold"
                  TextColor="{StaticResource Primary}"

@@ -1,89 +1,59 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"  
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:shared="clr-namespace:EventHub.Shared.Dtos;assembly=EventHub.Shared"
-             xmlns:model="clr-namespace:EventHub.Models"  
-             xmlns:viewmodel="clr-namespace:EventHub.ViewModels.Event"  
-             x:DataType="viewmodel:MyEventsViewModel"  
-             x:Class="EventHub.Views.Event.MyEventsPage"  
-             Title="My Events">
-    
-    <ScrollView>
-        <!-- Single Root Container -->
-        <VerticalStackLayout Padding="15" Spacing="15">
-            <!-- Empty View -->
-            <VerticalStackLayout IsVisible="{Binding HasNoEvents}" HorizontalOptions="Center" VerticalOptions="Center">
-                <Label Text="No favorite events yet."
-                   FontSize="18"
-                   TextColor="Gray"
-                   HorizontalTextAlignment="Center"/>
-                <Label Text="Mark events as favorites to see them here!"
-                   FontSize="14"
-                   TextColor="Gray"
-                   HorizontalTextAlignment="Center"
-                   Margin="0,5,0,0"/>
-            </VerticalStackLayout>
- 
-            <!-- Event List -->
+             xmlns:converters="clr-namespace:EventHub.Converters"
+             xmlns:controls="clr-namespace:EventHub.Controls"
+             xmlns:model="clr-namespace:EventHub.Models"
+             xmlns:viewmodel="clr-namespace:EventHub.ViewModels.Event"
+             x:DataType="viewmodel:MyEventsViewModel"
+             x:Class="EventHub.Views.Event.MyEventsPage"
+             Title="MyEventsPage">
+
+    <Grid RowDefinitions="Auto,*">
+        <RefreshView Grid.Row="1"
+                     Command="{Binding LoadEventsCommand}"
+                     IsRefreshing="{Binding IsBusy}">
             <CollectionView ItemsSource="{Binding FavoriteEvents}"
-                        IsVisible="{Binding HasFavorites}">
+                          SelectionMode="None">
+                <CollectionView.EmptyView>
+                    <StackLayout Padding="20">
+                        <Label Text="No events found"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               IsVisible="{Binding NoEventsAvailable}"/>
+                    </StackLayout>
+                </CollectionView.EmptyView>
                 <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="shared:EventDto">
-                        <Border StrokeShape="RoundRectangle 15"  
-                            BackgroundColor="White"  
-                            Padding="15"
-                            Margin="0,5,0,0">
-                            <Grid ColumnDefinitions="Auto, *">
-                                <!-- Event Image -->
-                                <Image Grid.Column="0"  
-                                   Source="{Binding Image}"  
-                                   HeightRequest="60"  
-                                   WidthRequest="60"  
-                                   Aspect="AspectFill"/>
-
-                                <!-- Event Details -->
-                                <VerticalStackLayout Grid.Column="1" Spacing="5">
-                                    <Label Text="{Binding Title}"  
-                                       FontSize="18"  
-                                       FontAttributes="Bold"  
-                                       LineBreakMode="TailTruncation"/>
-                                    <Label Text="{Binding Location}"  
-                                       FontSize="14"  
-                                       TextColor="Gray"  
-                                       LineBreakMode="TailTruncation"/>
-                                    <Label Text="{Binding Date, StringFormat='On {0:MM/dd/yyyy}'}"  
-                                       FontSize="14"  
-                                       TextColor="Gray"  
-                                       Margin="0,5,0,0"/>
-                                </VerticalStackLayout>
-
-                                <!-- Action Buttons -->
-                                <Grid ColumnDefinitions="*, *" ColumnSpacing="10" VerticalOptions="End">
-                                    <Button Grid.Column="0"  
-                                        BackgroundColor="#0078D4"  
-                                        TextColor="White"  
-                                        CornerRadius="10"  
-                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:MyEventsViewModel}}, Path=SignInCommand}"  
-                                        CommandParameter="{Binding .}"  
-                                        Text="Sign In"  
-                                        FontSize="14"  
-                                        HeightRequest="35"/>
-
-                                    <Button Grid.Column="1"  
-                                        BackgroundColor="#FF4D4D"  
-                                        TextColor="White"  
-                                        CornerRadius="10"  
-                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:MyEventsViewModel}}, Path=DeleteCommand}"  
-                                        CommandParameter="{Binding .}"  
-                                        Text="Delete"  
-                                        FontSize="14"  
-                                        HeightRequest="35"/>
+                    <DataTemplate x:DataType="model:Event">
+                        <Grid Padding="10"
+                              ColumnDefinitions="*,Auto">
+                            <Border Grid.Column="0"
+                                   Padding="0"
+                                   Style="{StaticResource CardView}">
+                                <Grid Padding="10"
+                                      ColumnDefinitions="*,Auto">
+                                    <VerticalStackLayout Grid.Column="0"
+                                                       Spacing="5">
+                                        <Label Text="{Binding Title}"
+                                               Style="{StaticResource LargeLabel}"/>
+                                        <Label Text="{Binding Description}"
+                                               Style="{StaticResource MediumLabel}"
+                                               MaxLines="2"/>
+                                        <Label Text="{Binding Date, StringFormat='{0:MMM dd, yyyy}'}"
+                                               Style="{StaticResource SmallLabel}"/>
+                                    </VerticalStackLayout>
+                                    <Button Grid.Column="1"
+                                            Text="Sign Up"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:MyEventsViewModel}}, Path=ToggleFavoriteCommand}"
+                                            CommandParameter="{Binding .}"
+                                            Style="{StaticResource PrimaryButton}"/>
                                 </Grid>
-                            </Grid>
-                        </Border>
+                            </Border>
+                        </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
-        </VerticalStackLayout>
-    </ScrollView>
+        </RefreshView>
+    </Grid>
 </ContentPage>

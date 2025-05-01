@@ -9,7 +9,7 @@ namespace EventHub
         {
             InitializeComponent();
             Routing.RegisterRoute(nameof(DetailsPage), typeof(DetailsPage));
-            //Routing.RegisterRoute(nameof(HomePage), typeof(HomePage));
+            
         }
     }
 }

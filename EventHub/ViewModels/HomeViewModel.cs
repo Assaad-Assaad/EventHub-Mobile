@@ -11,14 +11,13 @@ namespace EventHub.ViewModels
 {
     public partial class HomeViewModel : BaseViewModel
     {
-
         private readonly EventsService _eventService;
         private readonly SyncCoordinator _syncCoordinator;  
         private readonly AuthService _authService;
         private readonly DatabaseContext _context;
 
         [ObservableProperty]
-        private string welcomeMessage;
+        private string _welcomeMessage;
 
         [ObservableProperty]
         private bool _noEventsAvailable;
@@ -30,8 +29,6 @@ namespace EventHub.ViewModels
 
         public ObservableCollection<Models.Event> RecentEvents { get; } = new();
 
-
-
         public HomeViewModel(DatabaseContext context,
                             EventsService eventService, 
                             SyncCoordinator syncCoordinator,
@@ -42,12 +39,60 @@ namespace EventHub.ViewModels
             _authService = authService;
             _context = context;
 
+            // Subscribe to authentication state changes
+            _authService.UserLoggedIn += OnUserLoggedIn;
+            _authService.UserLoggedOut += OnUserLoggedOut;
 
             MessagingCenter.Subscribe<SyncCoordinator>(
                 this,
                 "EventsUpdated",
                 async (sender) => await LoadEventsAsync()
             );
+
+            // Load initial state
+            LoadUserData();
+        }
+
+        private void OnUserLoggedIn(object sender, LoggedInUser user)
+        {
+            Name = user.Name;
+            WelcomeMessage = $"Hello: {Name}";
+        }
+
+        private void OnUserLoggedOut(object sender, EventArgs e)
+        {
+            Name = "Stranger";
+            WelcomeMessage = "Welcome!";
+        }
+
+        private void LoadUserData()
+        {
+            try
+            {
+                var currentUser = _authService.CurrentUser;
+                if (currentUser != null)
+                {
+                    Name = currentUser.Name;
+                    WelcomeMessage = $"Hello: {Name}";
+                }
+                else
+                {
+                    Name = "Stranger";
+                    WelcomeMessage = "Welcome!";
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error loading user: {ex.Message}");
+            }
+        }
+
+        public async Task InitializeAsync()
+        {
+            if (_isInitialized) return;
+            _isInitialized = true;
+
+            await LoadEventsAsync();
         }
 
         [RelayCommand]
@@ -69,16 +114,14 @@ namespace EventHub.ViewModels
                 }
 
                 NoEventsAvailable = RecentEvents.Count == 0;
-            });
+            }, requireOnline: false);
         }
-
 
         [RelayCommand]
         public async Task GoToAllEventsAsync()
         {
             await Shell.Current.GoToAsync($"//{nameof(AllEventsPage)}");
         }
-
 
         [RelayCommand]
         public async Task GoToDetailsAsync(Models.Event selectedEvent)
@@ -90,38 +133,5 @@ namespace EventHub.ViewModels
                 ["Event"] = selectedEvent
             });
         }
-
-        private void LoadUserData()
-        {
-            try
-            {
-                var currentUser = _authService.CurrentUser;
-
-                if (currentUser != null)
-                {
-                    Name = currentUser.Name;
-                    WelcomeMessage = $"Hello: {Name}";
-                }
-                else
-                {
-                    Name = "Stranger";
-                    WelcomeMessage = "Welcome!";
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($" Error loading user: {ex.Message}");
-            }
-        }
-
-        public async Task InitializeAsync()
-        {
-            if (_isInitialized) return;
-            _isInitialized = true;
-
-            LoadUserData();
-            await LoadEventsAsync();
-        }
-
     }
 }

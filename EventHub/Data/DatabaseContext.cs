@@ -29,6 +29,7 @@ namespace EventHub.Data
                 await Database.CreateTableAsync<LoggedInUser>();
                 await Database.CreateTableAsync<UserEvent>();
                 await Database.CreateTableAsync<SyncHistory>();
+                await Database.CreateTableAsync<FavoriteEvent>();
             }
             catch (Exception ex)
             {
@@ -56,6 +57,10 @@ namespace EventHub.Data
         public async Task<List<T>> GetAllItemsAsync<T>() where T : new()
         {
             return await Database.Table<T>().ToListAsync();
+        }
+        public async Task GetItemAsync<T>(T item) where T : new()
+        {
+            await Database.InsertOrReplaceAsync(item);
         }
 
         public async Task<T> GetItemByIdAsync<T>(int id) where T : new()

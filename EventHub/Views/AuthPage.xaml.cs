@@ -16,20 +16,16 @@ public partial class AuthPage : ContentPage
         _authService = authService;
     }
 
-
-    protected override void OnAppearing()
+    protected override async void OnAppearing()
     {
         base.OnAppearing();
-        //_authViewModel.Initialize(_authViewModel.IsFirstTime);
+        await _authViewModel.InitializeAsync();
     }
 
     protected override async void OnNavigatedTo(NavigatedToEventArgs args)
     {
         base.OnNavigatedTo(args);
-        //if (await _authService.IsAuthenticated())
-        //{
-        //    await Shell.Current.GoToAsync($"//{nameof(HomePage)}");
-        //}
+        
            
            
         

@@ -93,20 +93,20 @@ namespace EventHub.Services
                         existing.Location = serverEvent.Location;
 
                         await _context.SaveItemAsync(existing);
-                        Debug.WriteLine($"🔄 Updated event {serverEvent.Id}");
+                        Debug.WriteLine($" Updated event {serverEvent.Id}");
                     }
                 }
 
                 
                 await _context.UpdateLastSyncTime(DateTime.UtcNow);
-                Debug.WriteLine("✅ Sync completed successfully");
+                Debug.WriteLine("Sync completed successfully");
 
                 // Notify UI
                 MessagingCenter.Send(this, "EventsUpdated");
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"❌ Sync error: {ex.Message}");
+                Debug.WriteLine($" Sync error: {ex.Message}");
             }
         }
 

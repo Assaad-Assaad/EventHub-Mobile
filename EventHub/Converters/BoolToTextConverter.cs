@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace EventHub.Utils
+namespace EventHub.Converters
 {
     //public class BoolToTextConverter : IValueConverter
     //{

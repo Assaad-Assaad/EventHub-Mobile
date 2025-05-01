@@ -1,4 +1,5 @@
 ﻿using EventHub.Data;
+using EventHub.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,48 +10,22 @@ namespace EventHub.Services
 {
     public class UserEventService
     {
-        //private readonly DatabaseContext _context;
-        //private readonly IUserEventsApi _userApi;
+        private readonly DatabaseContext _context;
+        private readonly HttpClient _httpClient;
+        private readonly AuthService _authService;
 
-        //public UserEventService(DatabaseContext context, IUserEventsApi userApi)
-        //{
-        //    _context = context;
-        //    _userApi = userApi;
-        //}
+        public UserEventService(DatabaseContext context, HttpClient httpClient, AuthService authService)
+        {
+            _context = context;
+            _httpClient = httpClient;
+            _authService = authService;
+        }
 
-        //// Mark an event as signed up by the user
-        //public async Task MarkEventAsSignedInAsync(int userId, int eventId)
-        //{
-        //    var userEvent = await _context.GetUserEventAsync(userId, eventId);
-        //    if (userEvent == null)
-        //    {
-        //        // Create new user-event mapping
-        //        userEvent = new UserEvent { UserId = userId, EventId = eventId, IsSignedIn = true };
-        //        await _context.AddItemAsync(userEvent);
-        //    }
-        //    else
-        //    {
-        //        userEvent.IsSignedIn = true;
-        //        await _context.UpdateItemAsync(userEvent);
-        //    }
-        //}
 
-        //// Mark an event as a favorite for the user
-        //public async Task MarkEventAsFavoriteAsync(int userId, int eventId)
-        //{
-        //    var userEvent = await _context.GetUserEventAsync(userId, eventId);
-        //    if (userEvent == null)
-        //    {
-        //        // Create new user-event mapping
-        //        userEvent = new UserEvent { UserId = userId, EventId = eventId, IsFavorite = true };
-        //        await _context.AddItemAsync(userEvent);
-        //    }
-        //    else
-        //    {
-        //        userEvent.IsFavorite = true;
-        //        await _context.UpdateItemAsync(userEvent);
-        //    }
-        //}
+
+        
+
+
     }
 
 }

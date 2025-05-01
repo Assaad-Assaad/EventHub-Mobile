@@ -1,36 +1,31 @@
 using EventHub.ViewModels;
+using EventHub.Views.Event;
+using System.Threading.Tasks;
 
 namespace EventHub.Views;
 
 public partial class ProfilePage : ContentPage
 {
 	
-	
-	public static readonly BindableProperty TextProperty =
-        BindableProperty.Create(nameof(Text), typeof(string), typeof(ProfilePage), default(string));
-
-
+    private readonly ProfileViewModel _profileViewModel;
     public ProfilePage(ProfileViewModel profileViewModel)
 	{
 		InitializeComponent();
-        BindingContext = profileViewModel;
+        _profileViewModel = profileViewModel;
+        BindingContext = _profileViewModel;
+
     }
 
-    public string Text
+    private async Task ProfileOptionRow_Tapped(object sender, string optionText)
     {
-        get => (string)GetValue(TextProperty);
-        set => SetValue(TextProperty, value);
+        switch (optionText)
+        {
+            case "My Events":
+               // Shell.Current.GoToAsync($"//{nameof(MyEventsPage)}");
+               await _profileViewModel.ShowToastAsync("My Events Clicked");
+                break;
+            
+        }
     }
 
-
-    public event EventHandler<string> Tapped;
-
-    public void TapGestureRecognizer_Tapped(object sender, EventArgs e)
-    {
-        
-        
-        Tapped?.Invoke(this, Text);
-    }
-
-    
 }
