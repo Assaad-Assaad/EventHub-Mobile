@@ -1,0 +1,120 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"  
+            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"  
+            xmlns:viewmodel="clr-namespace:EventHub.ViewModels.Event"  
+            x:DataType="viewmodel:DetailsViewModel"  
+            x:Class="EventHub.Views.Event.DetailsPage"  
+            Shell.NavBarIsVisible="False"  
+            Shell.PresentationMode="ModalAnimated"  
+            BackgroundColor="White">
+
+
+    <Grid RowSpacing="20"
+      Padding="10, 20, 10, 10"
+      RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto">
+
+        <!-- ROW 0: Header -->
+        <FlexLayout Grid.Row="0" JustifyContent="SpaceBetween">
+            <Border Background="White"
+                HeightRequest="30"
+                WidthRequest="30"
+                StrokeShape="RoundRectangle 5"
+                StrokeThickness="0"
+                Padding="4"
+                VerticalOptions="Center">
+                <ImageButton Source="left_arrow.png"
+                         BackgroundColor="Transparent"
+                         Clicked="OnBackClicked"/>
+            </Border>
+
+            <Label Text="Event Details"
+               FontSize="20"
+               FontAttributes="Bold"
+               VerticalOptions="Center"/>
+
+            <Border Background="White"
+                HeightRequest="30"
+                WidthRequest="30"
+                StrokeShape="RoundRectangle 5"
+                StrokeThickness="0"
+                Padding="4"
+                VerticalOptions="Center">
+                <Image Source="heart.png"/>
+            </Border>
+        </FlexLayout>
+
+        <!-- ROW 1: Circular Image -->
+        <Border Grid.Row="1"
+            HeightRequest="250"
+            WidthRequest="250"
+            StrokeShape="RoundRectangle 150"
+            StrokeThickness="0"
+            Padding="10"
+            HorizontalOptions="Center">
+            <Image Source="{Binding SelectedEvent.Image}"
+               Aspect="AspectFill"
+               HeightRequest="250"
+               WidthRequest="250"/>
+        </Border>
+
+        <!-- ROW 2: Title and Category -->
+        <Grid Grid.Row="2"
+          RowDefinitions="Auto"
+          ColumnDefinitions="*, Auto"
+          ColumnSpacing="10"
+              Padding="0, 10, 10, 0">
+            <Label Grid.Column="0"
+               Text="{Binding SelectedEvent.Title}"
+               FontSize="20"
+               FontAttributes="Bold"/>
+
+            <Label Grid.Column="1"
+               Text="{Binding SelectedEvent.Category}"
+               FontSize="16"
+               HorizontalOptions="End"
+               VerticalOptions="Center"/>
+        </Grid>
+
+        <!-- ROW 3: Description, Location, Date, and Button -->
+        <StackLayout Grid.Row="3"
+                 Spacing="15"
+                 Padding="10, 10, 10, 20"
+                 VerticalOptions="Start">
+            
+            <Label Text="{Binding SelectedEvent.Description}"
+               FontSize="18"
+               LineHeight="1.2"/>
+        </StackLayout>
+
+        <Grid Grid.Row="4"
+                   RowDefinitions="Auto"
+                   ColumnDefinitions="*, Auto"
+                   ColumnSpacing="10"
+              
+              Padding="5, 0, 5, 50">
+            <Label Grid.Column="0"
+                        Text="{Binding SelectedEvent.Date}"
+                        FontSize="18"/>
+
+
+            <Label Grid.Column="1"
+                        Text="{Binding SelectedEvent.Location}"
+                        FontSize="16"
+                        HorizontalOptions="End"
+                        VerticalOptions="Center"/>
+            
+            
+           </Grid>
+
+        <VerticalStackLayout Grid.Row="5" Spacing="20">
+
+            <Button Style="{StaticResource btnPrimary}"
+                Text="Sign up" />
+        </VerticalStackLayout>
+           
+        
+
+    </Grid>
+
+
+
+</ContentPage>

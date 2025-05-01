@@ -1,0 +1,127 @@
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using EventHub.Data;
+using EventHub.Models;
+using EventHub.Services;
+using EventHub.Views.Event;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+
+namespace EventHub.ViewModels
+{
+    public partial class HomeViewModel : BaseViewModel
+    {
+
+        private readonly EventsService _eventService;
+        private readonly SyncCoordinator _syncCoordinator;  
+        private readonly AuthService _authService;
+        private readonly DatabaseContext _context;
+
+        [ObservableProperty]
+        private string welcomeMessage;
+
+        [ObservableProperty]
+        private bool _noEventsAvailable;
+
+        private bool _isInitialized;
+
+        [ObservableProperty]
+        private string _name = "Stranger";
+
+        public ObservableCollection<Models.Event> RecentEvents { get; } = new();
+
+
+
+        public HomeViewModel(DatabaseContext context,
+                            EventsService eventService, 
+                            SyncCoordinator syncCoordinator,
+                            AuthService authService)
+        {
+            _eventService = eventService;
+            _syncCoordinator = syncCoordinator;
+            _authService = authService;
+            _context = context;
+
+
+            MessagingCenter.Subscribe<SyncCoordinator>(
+                this,
+                "EventsUpdated",
+                async (sender) => await LoadEventsAsync()
+            );
+        }
+
+        [RelayCommand]
+        private async Task LoadEventsAsync()
+        {
+            await RunBusyActionAsync(async () =>
+            {
+                if (IsOnline())
+                {
+                    await _syncCoordinator.SyncEventsAsync();
+                }
+
+                var events = await _eventService.GetRecentEventsAsync(6);
+
+                RecentEvents.Clear();
+                foreach (var evt in events)
+                {
+                    RecentEvents.Add(evt);
+                }
+
+                NoEventsAvailable = RecentEvents.Count == 0;
+            });
+        }
+
+
+        [RelayCommand]
+        public async Task GoToAllEventsAsync()
+        {
+            await Shell.Current.GoToAsync($"//{nameof(AllEventsPage)}");
+        }
+
+
+        [RelayCommand]
+        public async Task GoToDetailsAsync(Models.Event selectedEvent)
+        {
+            if (selectedEvent == null)
+                return;
+            await Shell.Current.GoToAsync(nameof(DetailsPage), true, new Dictionary<string, object>
+            {
+                ["Event"] = selectedEvent
+            });
+        }
+
+        private void LoadUserData()
+        {
+            try
+            {
+                var currentUser = _authService.CurrentUser;
+
+                if (currentUser != null)
+                {
+                    Name = currentUser.Name;
+                    WelcomeMessage = $"Hello: {Name}";
+                }
+                else
+                {
+                    Name = "Stranger";
+                    WelcomeMessage = "Welcome!";
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($" Error loading user: {ex.Message}");
+            }
+        }
+
+        public async Task InitializeAsync()
+        {
+            if (_isInitialized) return;
+            _isInitialized = true;
+
+            LoadUserData();
+            await LoadEventsAsync();
+        }
+
+    }
+}

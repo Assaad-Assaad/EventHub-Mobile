@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:shared="clr-namespace:EventHub.Shared.Dtos;assembly=EventHub.Shared"
+             xmlns:model="clr-namespace:EventHub.Models"
+             xmlns:viewmodel="clr-namespace:EventHub.ViewModels"
+             xmlns:converters="clr-namespace:EventHub.Utils"
+             x:DataType="viewmodel:AuthViewModel"
+             x:Class="EventHub.Views.AuthPage"
+             Title="">
+
+    <Grid RowDefinitions="2*, 3*">
+
+        <!-- Header Section: Logo and Welcome Message -->
+        <VerticalStackLayout Grid.Row="0" Spacing="10" VerticalOptions="Center" HorizontalOptions="Center">
+            <!-- Circular Image with Shadow -->
+            <Border StrokeShape="RoundRectangle 150"
+                HeightRequest="200"
+                WidthRequest="200"
+                Stroke="{StaticResource Primary}"
+                StrokeThickness="10">
+                <Image Source="events.png"
+                   Aspect="AspectFill"
+                   HeightRequest="200"
+                   WidthRequest="200"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Center"/>
+                <Border.Shadow>
+                    <Shadow Brush="{StaticResource Primary}" Radius="250"/>
+                </Border.Shadow>
+            </Border>
+
+            <!-- Welcome Text -->
+            <Label Text="Welcome to Event Hub"
+               FontSize="24"
+               FontAttributes="Bold"
+               HorizontalOptions="Center"
+               TextColor="{StaticResource Primary}"/>
+            <Label Text="Explore and enjoy amazing events!"
+               FontSize="16"
+               HorizontalOptions="Center"
+               TextColor="{StaticResource Primary}"/>
+        </VerticalStackLayout>
+
+        <!-- Main Content: Login/Register Form -->
+        <ScrollView Grid.Row="1" Padding="15">
+            <VerticalStackLayout Spacing="30">
+
+                <!-- Title and Mode Switch -->
+                <Grid ColumnDefinitions="*, Auto">
+                    <!-- Dynamic Title (Login/Register) -->
+                    <Label Grid.Row="0" 
+                       Text="Login"
+                       FontSize="40" 
+                       FontAttributes="Bold" 
+                       LineHeight="1.2">
+                        <Label.Triggers>
+                            <DataTrigger TargetType="Label"
+                                     Binding="{Binding IsRegisteringMode}"
+                                     Value="True">
+                                <Setter Property="Text" Value="Register"/>
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+
+                    <!-- Mode Switch Link -->
+                    <Label Grid.Column="1"
+                       Text="Switch to Register"
+                       VerticalOptions="Center"
+                       HorizontalOptions="End"
+                       Padding="5"
+                       BackgroundColor="White"
+                       FontAttributes="Bold"
+                       TextDecorations="Underline">
+                        <Label.Triggers>
+                            <DataTrigger TargetType="Label"
+                                     Binding="{Binding IsRegisteringMode}"
+                                     Value="True">
+                                <Setter Property="Text" Value="Switch to Login"/>
+                            </DataTrigger>
+                        </Label.Triggers>
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ToggleModeCommand}"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                </Grid>
+
+                <!-- Input Fields -->
+                <VerticalStackLayout Spacing="10">
+
+                    <!-- Name Field (Visible Only in Registration Mode) -->
+                    <Entry Placeholder="Enter name"
+                       Text="{Binding Name}"
+                       PlaceholderColor="{StaticResource Primary}"
+                       IsVisible="{Binding IsRegisteringMode}"/>
+                    
+
+                    <!-- Email Field -->
+                    <Entry Placeholder="Enter email"
+                       Text="{Binding Email}"
+                       PlaceholderColor="{StaticResource Primary}"
+                       Keyboard="Email"/>
+
+                    <!-- Password Field -->
+                    <Entry Placeholder="Enter password"
+                       Text="{Binding Password}"
+                       PlaceholderColor="{StaticResource Primary}"
+                       IsPassword="True"/>
+                </VerticalStackLayout>
+
+                <!-- Submit Button (Login/Register) -->
+                <Button Style="{StaticResource btnPrimary}" Text="Login"
+                    Command="{Binding SubmitCommand}">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button"
+                                 Binding="{Binding IsRegisteringMode}"
+                                 Value="True">
+                            <Setter Property="Text" Value="Register"/>
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+
+                <!-- Skip for Now Option -->
+                <Grid ColumnDefinitions="*, Auto, *" ColumnSpacing="5">
+                    <BoxView Grid.Column="0" 
+                         HeightRequest="1" 
+                         Color="{StaticResource Primary}"/>
+                    <Button Grid.Column="1" 
+                        Text="Skip for now"
+                        HorizontalOptions="Center"
+                        Padding="25, 5"
+                        HeightRequest="30"
+                        Command="{Binding SkipForNowCommand}"/>
+                    <BoxView Grid.Column="2" 
+                         HeightRequest="1" 
+                         Color="{StaticResource Primary}"/>
+                </Grid>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Activity Indicator -->
+        <ActivityIndicator HeightRequest="30"
+                       WidthRequest="30"
+                       HorizontalOptions="Center"
+                       IsRunning="{Binding IsBusy}"
+                       Color="{StaticResource Primary}"/>
+    </Grid>
+
+</ContentPage>

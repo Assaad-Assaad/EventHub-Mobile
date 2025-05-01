@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:shared="clr-namespace:EventHub.Shared.Dtos;assembly=EventHub.Shared"
+             xmlns:model="clr-namespace:EventHub.Models"
+             xmlns:viewmodel="clr-namespace:EventHub.ViewModels.Event"
+             x:DataType="viewmodel:EventToUserViewModel"
+             x:Class="EventHub.Views.Event.EventToUserPage"
+             Title="Users's Events">
+    <VerticalStackLayout>
+        <Label 
+            Text="Welcome to .NET MAUI!"
+            VerticalOptions="Center" 
+            HorizontalOptions="Center" />
+    </VerticalStackLayout>
+</ContentPage>

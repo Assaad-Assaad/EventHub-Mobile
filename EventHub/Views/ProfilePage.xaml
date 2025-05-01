@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:shared="clr-namespace:EventHub.Shared.Dtos;assembly=EventHub.Shared"
+             xmlns:model="clr-namespace:EventHub.Models"
+             xmlns:viewmodel="clr-namespace:EventHub.ViewModels"
+             x:DataType="viewmodel:ProfileViewModel"
+             x:Class="EventHub.Views.ProfilePage"
+             Title="Profile">
+
+
+    
+
+    <Grid RowDefinitions="Auto, *, Auto" RowSpacing="15">
+        <!-- User Avatar -->
+        <VerticalStackLayout Grid.Row="0" Spacing="5">
+            <Border BackgroundColor="{StaticResource Primary}"
+                    HeightRequest="100"
+                    WidthRequest="100"
+                    StrokeShape="RoundRectangle 50"
+                    StrokeThickness="0">
+                <Label Text="{Binding Initials}"
+                       TextColor="White"
+                       FontSize="50"
+                       VerticalOptions="Center"
+                       HorizontalOptions="Center"
+                       TextTransform="Uppercase"
+                       FontAttributes="Bold" />
+            </Border>
+            <Label Text="{Binding Name}"
+                   HorizontalOptions="Center"
+                   FontSize="20"
+                   FontAttributes="Bold"
+                   TextColor="{StaticResource Primary}" />
+        </VerticalStackLayout>
+
+        <!-- Profile Information -->
+        <VerticalStackLayout Grid.Row="1" Spacing="10" Padding="15">
+            <Grid RowDefinitions="*, Auto" ColumnDefinitions="*, Auto" RowSpacing="10">
+                <Label Grid.Row="0"
+                       Grid.Column="0"
+                       Text="My favorite events"
+                       FontSize="20"
+                       TextColor="{StaticResource Primary}" />
+                <Image Grid.Row="0"
+                       Grid.Column="1"
+                       Source="right_arrow.png"
+                       HeightRequest="25"
+                       WidthRequest="25">
+                    <Image.Behaviors>
+                        <toolkit:IconTintColorBehavior TintColor="{StaticResource Primary}"/>
+                    </Image.Behaviors>
+                </Image>
+                <BoxView Grid.Row="1"
+                         Grid.ColumnSpan="2"
+                         HeightRequest="1"
+                         Color="{StaticResource Primary}"
+                         Opacity="0.25" />
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" />
+                </Grid.GestureRecognizers>
+            </Grid>
+            <Grid RowDefinitions="*, Auto" ColumnDefinitions="*, Auto" RowSpacing="10">
+                <Label Grid.Row="0"
+                       Grid.Column="0"
+                       Text="{Binding Email}"
+                       FontSize="20"
+                       TextColor="{StaticResource Primary}" />
+                <BoxView Grid.Row="1"
+                         Grid.ColumnSpan="1"
+                         Color="{StaticResource Primary}"
+                         Opacity="0.25" />
+            </Grid>
+        </VerticalStackLayout>
+
+        <!-- Login/Logout Button -->
+        <Button Grid.Row="2"
+                Padding="50, 5"
+                HeightRequest="30"
+                HorizontalOptions="Center"
+                Text="Login"
+                Style="{StaticResource btnPrimary}"
+                Command="{Binding LoginLogoutCommand}">
+            <Button.Triggers>
+                <DataTrigger TargetType="Button"
+                             Binding="{Binding IsLoggedIn}"
+                             Value="True">
+                    <Setter Property="Text" Value="Logout" />
+                </DataTrigger>
+               
+            </Button.Triggers>
+        </Button>
+
+        <!-- Loading Indicator --><!--
+        <ActivityIndicator Grid.Row="0"
+                           Grid.RowSpan="3"
+                           IsVisible="{Binding IsBusy}"
+                           IsRunning="{Binding IsBusy}"
+                           Color="{StaticResource Primary}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />-->
+    </Grid>
+
+</ContentPage>
