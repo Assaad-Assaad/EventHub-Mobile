@@ -68,7 +68,17 @@ namespace EventHub.ViewModels
             }
             else
             {
-                await _authService.LogoutAsync();
+                var confirm = await ShowConfirmAsync(
+                    "Logout",
+                    "Are you sure you want to logout?",
+                    "Yes",
+                    "No");
+
+                if (confirm)
+                {
+                    await _authService.LogoutAsync();
+                    await ShowToastAsync("Logged out successfully");
+                }
             }
         }
 

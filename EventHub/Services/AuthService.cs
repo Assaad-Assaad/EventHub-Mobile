@@ -234,7 +234,6 @@ namespace EventHub.Services
         public async Task LogoutAsync()
         {
             await ClearAuthData();
-            await Shell.Current.GoToAsync($"//{nameof(AuthPage)}");
         }
 
         private async Task ClearAuthData()

@@ -24,20 +24,25 @@ namespace EventHub.Data
             {
                 if (_connection != null) return;
 
+                // Create tables in order of dependencies
+                await Database.CreateTableAsync<SyncHistory>();
                 await Database.CreateTableAsync<Event>();
                 await Database.CreateTableAsync<User>();
                 await Database.CreateTableAsync<LoggedInUser>();
                 await Database.CreateTableAsync<UserEvent>();
-                await Database.CreateTableAsync<SyncHistory>();
-                await Database.CreateTableAsync<FavoriteEvent>();
+
+                // Drop old tables that are no longer used
+                await Database.ExecuteAsync("DROP TABLE IF EXISTS FavoriteEvent");
+
+                Debug.WriteLine("✅ Database initialized successfully");
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"DB Error: {ex.Message}");
+                Debug.WriteLine($"❌ DB Error: {ex.Message}");
+                Debug.WriteLine($"❌ DB Stack Trace: {ex.StackTrace}");
+                throw; // Re-throw to ensure the app knows initialization failed
             }
         }
-
-       
 
         public async Task SaveItemAsync<T>(T item) where T : new()
         {
@@ -68,6 +73,9 @@ namespace EventHub.Data
             return await Database.FindAsync<T>(id);
         }
 
+       
+
+
         public async Task DeleteItemAsync<T>(T item) where T : new()
         {
             await Database.DeleteAsync(item);
@@ -83,11 +91,15 @@ namespace EventHub.Data
             await Database.DeleteAllAsync<T>();
         }
 
+        public async Task<T> GetItemAsync<T>(Expression<Func<T, bool>> predicate) where T : new()
+        {
+            return await Database.Table<T>().Where(predicate).FirstOrDefaultAsync();
+        }
+
         public async Task<List<T>> GetItemsAsync<T>(Expression<Func<T, bool>> predicate) where T : new()
         {
             return await Database.Table<T>().Where(predicate).ToListAsync();
         }
-
 
         public async ValueTask DisposeAsync()
         {
@@ -98,23 +110,19 @@ namespace EventHub.Data
             }
         }
 
-
-
         public async Task<DateTime?> GetLastSyncTime()
         {
             try
             {
-                // Create table if not exists
-                await Database.CreateTableAsync<SyncHistory>();
-
                 var lastSync = await Database.Table<SyncHistory>()
                     .OrderByDescending(sh => sh.SyncDate)
                     .FirstOrDefaultAsync();
 
                 return lastSync?.SyncDate;
             }
-            catch
+            catch (Exception ex)
             {
+                Debug.WriteLine($"❌ Failed to get last sync time: {ex.Message}");
                 return null;
             }
         }
@@ -124,10 +132,12 @@ namespace EventHub.Data
             try
             {
                 await Database.InsertOrReplaceAsync(new SyncHistory { SyncDate = syncTime });
+                Debug.WriteLine($"✅ Sync time updated to: {syncTime}");
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"⚠️ Failed to update sync time: {ex.Message}");
+                Debug.WriteLine($"❌ Failed to update sync time: {ex.Message}");
+                Debug.WriteLine($"❌ Stack Trace: {ex.StackTrace}");
             }
         }
     }

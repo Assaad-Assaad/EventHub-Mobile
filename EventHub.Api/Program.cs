@@ -44,7 +44,8 @@ builder.Services.AddScoped<AuthService>()
     .AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<ProfileService>()
-                .AddScoped<EventsService>();
+                .AddScoped<EventsService>()
+                .AddScoped<UserEventService>();
 
 var app = builder.Build();
 AutoDbMigration(app.Services);

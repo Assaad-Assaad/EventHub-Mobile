@@ -112,29 +112,34 @@ namespace EventHub.Api.Services
 
         public async Task<ApiResult> ToggleFavoritesAsync(int userId, int eventId)
         {
-            var userEvent = await _context.UserEvents
-                .FirstOrDefaultAsync(ue => ue.UserId == userId && ue.EventId == eventId);
-
-            if (userEvent != null)
+            try
             {
+                var userEvent = await _context.UserEvents
+                    .FirstOrDefaultAsync(ue => ue.UserId == userId && ue.EventId == eventId);
 
-                userEvent.IsFavorite = !userEvent.IsFavorite;
-            }
-            else
-            {
-
-                userEvent = new UserEvent
+                if (userEvent != null)
                 {
-                    UserId = userId,
-                    EventId = eventId,
-                    IsFavorite = true,
-                    IsSignedIn = false
-                };
-                await _context.UserEvents.AddAsync(userEvent);
-            }
+                    userEvent.IsFavorite = !userEvent.IsFavorite;
+                }
+                else
+                {
+                    userEvent = new UserEvent
+                    {
+                        UserId = userId,
+                        EventId = eventId,
+                        IsFavorite = true,
+                        IsSignedIn = false
+                    };
+                    await _context.UserEvents.AddAsync(userEvent);
+                }
 
-            await _context.SaveChangesAsync();
-            return ApiResult.Success();
+                await _context.SaveChangesAsync();
+                return ApiResult.Success();
+            }
+            catch (Exception ex)
+            {
+                return ApiResult.Fail($"Failed to toggle favorite status: {ex.Message}");
+            }
         }
 
     }

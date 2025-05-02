@@ -13,6 +13,7 @@
             </ResourceDictionary.MergedDictionaries>
             <!--<converters:BoolToTextConverter x:Key="BoolToTextConverter"/>-->
             <converters:FavoriteButtonTextConverter x:Key="FavoriteButtonTextConverter"/>
+            <converters:FavoriteIconConverter x:Key="FavoriteIconConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

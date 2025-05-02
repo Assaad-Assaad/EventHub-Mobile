@@ -38,6 +38,7 @@ namespace EventHub
             builder.Services.AddSingleton<AuthService>();
             builder.Services.AddSingleton<TokenService>();
             builder.Services.AddSingleton<CommonService>();
+            builder.Services.AddSingleton<FavoritesService>();
             builder.Services.AddTransient<MyEventsPage>().AddTransient<MyEventsViewModel>();
             builder.Services.AddTransient<AllEventsPage>().AddTransient<AllEventsViewModel>();
             builder.Services.AddTransient<AuthPage>().AddTransient<AuthViewModel>();

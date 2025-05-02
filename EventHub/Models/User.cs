@@ -1,7 +1,6 @@
 ﻿using SQLite;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,18 +12,16 @@ namespace EventHub.Models
         [PrimaryKey]
         public int Id { get; set; }
 
-        [Required]
-        [StringLength(200, MinimumLength = 2)]
+        [MaxLength(200)]
         public string Name { get; set; }
 
-        [Required]
-        [StringLength(200, MinimumLength = 2)]
+        [MaxLength(200)]
         public string Email { get; set; }
 
-        [Required]
-        [StringLength(200, MinimumLength = 6)]
+        [MaxLength(200)]
         public string PasswordHash { get; set; }
 
+        [MaxLength(50)]
         public string Role { get; set; } = "User";
 
         [Ignore]
