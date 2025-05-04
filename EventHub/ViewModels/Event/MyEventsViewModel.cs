@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using EventHub.Data;
 using EventHub.Models;
 using EventHub.Services;
 using EventHub.Views;
@@ -11,69 +12,88 @@ namespace EventHub.ViewModels.Event
 {
     public partial class MyEventsViewModel : BaseViewModel
     {
-        private readonly FavoritesService _favoritesService;
+        
+        private readonly SyncCoordinator _syncCoordinator;
         private readonly AuthService _authService;
+        private readonly UserEventService _userEventService;
+        private readonly EventsService _eventsService;
 
         [ObservableProperty]
-        private bool _noEventsAvailable;
+        private bool _noEvents;
 
-        public ObservableCollection<Models.Event> FavoriteEvents { get; } = new();
+        private bool _isInitialized;
+        [ObservableProperty]
+        private Models.Event _selectedEvent;
 
-        public MyEventsViewModel(FavoritesService favoritesService, AuthService authService)
+        public ObservableCollection<Models.Event> Events { get; } = new();
+
+        public MyEventsViewModel(SyncCoordinator syncCoordinator, AuthService authService, UserEventService userEventService, EventsService eventsService)
         {
-            _favoritesService = favoritesService;
+
             _authService = authService;
+            _syncCoordinator = syncCoordinator;
+            _userEventService = userEventService;
+            _eventsService = eventsService;
         }
+
 
         [RelayCommand]
         public async Task LoadEventsAsync()
         {
             if (_authService.CurrentUser == null)
             {
-                await ShowAlertAsync("Login Required", "Please log in to view your events.", "OK");
+                await Shell.Current.DisplayAlert("Error", "Please log in to view your events", "OK");
                 await Shell.Current.GoToAsync($"//{nameof(AuthPage)}");
                 return;
             }
 
             await RunBusyActionAsync(async () =>
             {
-                var events = await _favoritesService.GetFavoriteEventsAsync();
-                
-                FavoriteEvents.Clear();
-                foreach (var evt in events)
+                if (IsOnline())
                 {
-                    FavoriteEvents.Add(evt);
+                    await _syncCoordinator.SyncUserEventsAsync();
                 }
 
-                NoEventsAvailable = FavoriteEvents.Count == 0;
-            }, requireOnline: false);
-        }
+                var userEvents = await _userEventService.GetFavoriteEvents();
+                var events = await _eventsService.GetAllEventsAsync(); 
 
-        [RelayCommand]
-        private async Task ToggleFavoriteAsync(Models.Event selectedEvent)
-        {
-            if (selectedEvent == null) return;
-
-            await RunBusyActionAsync(async () =>
-            {
-                var isFavorite = await _favoritesService.ToggleFavoriteAsync(selectedEvent.Id);
-                if (!isFavorite)
+                Events.Clear();
+                foreach (var userEvent in userEvents)
                 {
-                    await ShowToastAsync("You've signed up for this event!");
-                    await LoadEventsAsync();
+                    var evt = events.FirstOrDefault(e => e.Id == userEvent.EventId);
+                    if (evt != null)
+                    {
+                        Events.Add(evt);
+                    }
                 }
+
+                NoEvents = !Events.Any();
             }, requireOnline: false);
         }
+        
 
         [RelayCommand]
-        private async Task GoToDetailsAsync(Models.Event selectedEvent)
+        public async Task SignForEvent()
         {
-            if (selectedEvent == null) return;
-
-            await Shell.Current.GoToAsync(nameof(DetailsPage), true, new Dictionary<string, object>
+            if (_authService.CurrentUser == null)
             {
-                ["Event"] = selectedEvent
-            });
+                await Shell.Current.DisplayAlert("Error", "Please log in to sign for events", "OK");
+                await Shell.Current.GoToAsync($"//{nameof(AuthPage)}");
+                return;
+            }
+
+            await ShowAlertAsync("Thank you", "You have successfully signed up for this event and we will see you there!", "OK");
+            await _userEventService.RemoveEventFromFavorites( SelectedEvent.Id);
+            await LoadEventsAsync();
         }
+
+          public async Task InitializeAsync()
+        {
+            if (_isInitialized) return;
+            _isInitialized = true;
+
+            await LoadEventsAsync();
+        }
+
     }
 } 

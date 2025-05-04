@@ -75,7 +75,7 @@ namespace EventHub.ViewModels.Event
 
 
         [RelayCommand]
-        private async Task GoToDetailsAsync(Models.Event selectedEvent)
+        public async Task GoToDetailsAsync(Models.Event selectedEvent)
         {
             if (selectedEvent == null)
                 return;
@@ -84,6 +84,7 @@ namespace EventHub.ViewModels.Event
                 ["Event"] = selectedEvent
             });
         }
+
 
 
         public async Task InitializeAsync()

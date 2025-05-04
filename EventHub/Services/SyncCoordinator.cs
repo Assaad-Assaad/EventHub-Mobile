@@ -1,10 +1,10 @@
-﻿
-using EventHub.Data;
+﻿using EventHub.Data;
 using EventHub.Shared.Dtos;
 using System.Diagnostics;
 using System.Net.Http.Json;
 using EventHub.Models;
 using EventHub.Utils;
+using System.Linq;
 
 namespace EventHub.Services
 {
@@ -13,16 +13,20 @@ namespace EventHub.Services
 
         private readonly HttpClient _httpClient;
         private readonly DatabaseContext _context;
-         
+        private readonly AuthService _authService;
+        
+        private readonly SemaphoreSlim _syncLock = new SemaphoreSlim(1, 1);
+        private bool _isSyncing = false;
 
 
-        public SyncCoordinator(HttpClient httpClient, DatabaseContext context)
+        public SyncCoordinator(HttpClient httpClient, DatabaseContext context, AuthService authService)
         {
-           _httpClient = httpClient;
+            _httpClient = httpClient;
             _context = context;
-            
-
+            _authService = authService;
         }
+
+
 
 
         public async Task SyncEventsAsync()
@@ -37,11 +41,11 @@ namespace EventHub.Services
 
                 Debug.WriteLine(" Starting event sync...");
 
-                
+
                 var localEvents = await _context.GetAllItemsAsync<Event>();
                 var localEventIds = localEvents.Select(e => e.Id).ToHashSet();
 
-                
+
                 var response = await _httpClient.GetAsync($"{AppConstants.BaseUrl}/api/events");
 
                 if (!response.IsSuccessStatusCode)
@@ -56,7 +60,7 @@ namespace EventHub.Services
 
                 Debug.WriteLine($" Processing {serverEvents.Length} server events...");
 
-                
+
                 var idsToDelete = localEventIds.Except(serverEventIds);
                 foreach (var id in idsToDelete)
                 {
@@ -64,7 +68,7 @@ namespace EventHub.Services
                     Debug.WriteLine($" Deleted local event {id}");
                 }
 
-                
+
                 foreach (var serverEvent in serverEvents)
                 {
                     var existing = localEvents.FirstOrDefault(e => e.Id == serverEvent.Id);
@@ -97,7 +101,7 @@ namespace EventHub.Services
                     }
                 }
 
-                
+
                 await _context.UpdateLastSyncTime(DateTime.UtcNow);
                 Debug.WriteLine("Sync completed successfully");
 
@@ -109,6 +113,102 @@ namespace EventHub.Services
                 Debug.WriteLine($" Sync error: {ex.Message}");
             }
         }
+
+
+
+       // sync user events from server to local database and vice versa
+       public async Task SyncUserEventsAsync()
+       {
+        if (!IsOnline())
+        {
+            Debug.WriteLine("Offline - skipping user event sync");
+            return;
+        }
+
+        try
+        {
+            var token = await SecureStorage.GetAsync("auth_token");
+            if (string.IsNullOrEmpty(token)) return;
+
+            var userId = new TokenService().GetUserIdFromToken(token);
+            if (userId == 0) return;
+
+            Debug.WriteLine($"Starting user event sync for user {userId}...");
+
+            // Get local user events
+            var localUserEvents = await _context.GetItemsAsync<UserEvent>(ue => ue.UserId == userId);
+            Debug.WriteLine($"Found {localUserEvents.Count} local user events");
+
+            // Get server user events
+            var response = await _httpClient.GetAsync($"{AppConstants.BaseUrl}/api/user-events/{userId}");
+            if (!response.IsSuccessStatusCode)
+            {
+                Debug.WriteLine($"API request failed: {response.StatusCode}");
+                return;
+            }
+
+            var apiResult = await response.Content.ReadFromJsonAsync<ApiResult<UserEventDto[]>>();
+            var serverUserEvents = apiResult?.Data ?? Array.Empty<UserEventDto>();
+            Debug.WriteLine($"Retrieved {serverUserEvents.Length} user events from API");
+
+            // Delete local user events that don't exist on server
+            foreach (var localEvent in localUserEvents)
+            {
+                if (!serverUserEvents.Any(se => 
+                    se.UserId == localEvent.UserId && 
+                    se.EventId == localEvent.EventId))
+                {
+                    await _context.DeleteItemAsync(localEvent);
+                    Debug.WriteLine($"Deleted local user event for event {localEvent.EventId}");
+                }
+            }
+
+            // Add or update user events from server
+            foreach (var serverEvent in serverUserEvents)
+            {
+                var existing = localUserEvents.FirstOrDefault(le => 
+                    le.UserId == serverEvent.UserId && 
+                    le.EventId == serverEvent.EventId);
+
+                if (existing == null)
+                {
+                    var newUserEvent = new UserEvent
+                    {
+                        UserId = serverEvent.UserId,
+                        EventId = serverEvent.EventId,
+                        IsFavorite = serverEvent.IsFavorite,
+                        IsSignedIn = serverEvent.IsSignedIn,
+                        IsSynced = true,
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    await _context.SaveItemAsync(newUserEvent);
+                    Debug.WriteLine($"Added new user event for event {serverEvent.EventId}");
+                }
+                else
+                {
+                    existing.IsFavorite = serverEvent.IsFavorite;
+                    existing.IsSignedIn = serverEvent.IsSignedIn;
+                    existing.IsSynced = true;
+                    await _context.SaveItemAsync(existing);
+                    Debug.WriteLine($"Updated user event for event {serverEvent.EventId}");
+                }
+            }
+
+            await _context.UpdateLastSyncTime(DateTime.UtcNow);
+            Debug.WriteLine("User event sync completed successfully");
+            MessagingCenter.Send(this, "UserEventsUpdated");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"User event sync error: {ex.Message}");
+            Debug.WriteLine($"Stack trace: {ex.StackTrace}");
+        }
+    }    
+
+
+
+
+
 
 
         public async Task SyncUserDataAsync()
@@ -138,8 +238,6 @@ namespace EventHub.Services
                 Debug.WriteLine($"User sync error: {ex.Message}");
             }
         }
-
-
 
         private bool IsOnline()
         {

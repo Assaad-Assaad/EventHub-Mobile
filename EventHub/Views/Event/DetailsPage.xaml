@@ -116,7 +116,8 @@
         <VerticalStackLayout Grid.Row="5" Spacing="20">
 
             <Button Style="{StaticResource btnPrimary}"
-                Text="Sign up" />
+                Text="Sign up" 
+                Command="{Binding SignUpCommand}"/>
         </VerticalStackLayout>
            
         

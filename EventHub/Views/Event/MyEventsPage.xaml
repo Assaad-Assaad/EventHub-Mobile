@@ -8,7 +8,7 @@
              xmlns:viewmodel="clr-namespace:EventHub.ViewModels.Event"
              x:DataType="viewmodel:MyEventsViewModel"
              x:Class="EventHub.Views.Event.MyEventsPage"
-             Title="MyEventsPage">
+             Title="My Events">
 
     <Grid RowDefinitions="Auto,*">
         <RefreshView Grid.Row="1"
@@ -18,7 +18,7 @@
                           SelectionMode="None">
                 <CollectionView.EmptyView>
                     <StackLayout Padding="20">
-                        <Label Text="No events found"
+                        <Label Text="No favorite events found"
                                HorizontalOptions="Center"
                                VerticalOptions="Center"
                                IsVisible="{Binding NoEventsAvailable}"/>
@@ -44,7 +44,7 @@
                                                Style="{StaticResource SmallLabel}"/>
                                     </VerticalStackLayout>
                                     <Button Grid.Column="1"
-                                            Text="Sign Up"
+                                            Text="Remove"
                                             Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:MyEventsViewModel}}, Path=ToggleFavoriteCommand}"
                                             CommandParameter="{Binding .}"
                                             Style="{StaticResource PrimaryButton}"/>

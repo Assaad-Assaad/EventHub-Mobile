@@ -15,6 +15,7 @@ namespace EventHub.ViewModels
         private readonly SyncCoordinator _syncCoordinator;  
         private readonly AuthService _authService;
         private readonly DatabaseContext _context;
+        private readonly UserEventService _userEventService;
 
         [ObservableProperty]
         private string _welcomeMessage;
@@ -32,14 +33,16 @@ namespace EventHub.ViewModels
         public HomeViewModel(DatabaseContext context,
                             EventsService eventService, 
                             SyncCoordinator syncCoordinator,
-                            AuthService authService)
+                            AuthService authService,
+                            UserEventService userEventService)
         {
             _eventService = eventService;
             _syncCoordinator = syncCoordinator;
             _authService = authService;
             _context = context;
+            _userEventService = userEventService;
 
-            // Subscribe to authentication state changes
+            
             _authService.UserLoggedIn += OnUserLoggedIn;
             _authService.UserLoggedOut += OnUserLoggedOut;
 
@@ -133,5 +136,9 @@ namespace EventHub.ViewModels
                 ["Event"] = selectedEvent
             });
         }
+
+
+
+
     }
 }

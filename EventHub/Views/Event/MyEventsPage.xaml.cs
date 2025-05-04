@@ -16,6 +16,6 @@ public partial class MyEventsPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        await _myEventsViewModel.LoadEventsAsync();
+        await _myEventsViewModel.InitializeAsync();
     }
 }

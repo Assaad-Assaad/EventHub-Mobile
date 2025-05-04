@@ -4,6 +4,10 @@ using SQLite;
 using System.Diagnostics;
 using System.Linq.Expressions;
 
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Threading;
+
 namespace EventHub.Data
 {
     public class DatabaseContext : IAsyncDisposable
@@ -12,6 +16,7 @@ namespace EventHub.Data
         private static string DbPath => Path.Combine(FileSystem.AppDataDirectory, DbName);
 
         private SQLiteAsyncConnection _connection;
+       
 
         private SQLiteAsyncConnection Database =>
             _connection ??= new SQLiteAsyncConnection(
@@ -24,23 +29,40 @@ namespace EventHub.Data
             {
                 if (_connection != null) return;
 
-                // Create tables in order of dependencies
-                await Database.CreateTableAsync<SyncHistory>();
-                await Database.CreateTableAsync<Event>();
-                await Database.CreateTableAsync<User>();
-                await Database.CreateTableAsync<LoggedInUser>();
-                await Database.CreateTableAsync<UserEvent>();
+                // Drop existing database if it exists
+                //if (File.Exists(DbPath))
+                //{
+                //    File.Delete(DbPath);
+                //    Debug.WriteLine("Existing database deleted");
+                //}
 
-                // Drop old tables that are no longer used
-                await Database.ExecuteAsync("DROP TABLE IF EXISTS FavoriteEvent");
+                _connection = new SQLiteAsyncConnection(DbPath);
+                Debug.WriteLine("Database connection created");
 
-                Debug.WriteLine("✅ Database initialized successfully");
+                await _connection.CreateTableAsync<SyncHistory>();
+                await _connection.CreateTableAsync<Event>();
+                await _connection.CreateTableAsync<User>();
+                await _connection.CreateTableAsync<LoggedInUser>();
+                await _connection.CreateTableAsync<UserEvent>();
+
+                // Create unique index for UserEvent composite key
+                await _connection.ExecuteAsync(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS IX_UserEvent_UserId_EventId ON UserEvent(UserId, EventId)");
+
+                Debug.WriteLine("Tables created successfully");
+
+                await _connection.InsertAsync(new SyncHistory
+                {
+                    LastSyncTime = DateTime.UtcNow,
+                    SyncType = "Initial"
+                });
+                Debug.WriteLine("Initial sync history created");
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"❌ DB Error: {ex.Message}");
-                Debug.WriteLine($"❌ DB Stack Trace: {ex.StackTrace}");
-                throw; // Re-throw to ensure the app knows initialization failed
+                Debug.WriteLine($"Error initializing database: {ex.Message}");
+                Debug.WriteLine($"Stack trace: {ex.StackTrace}");
+                throw;
             }
         }
 
@@ -51,12 +73,12 @@ namespace EventHub.Data
 
         public async Task SaveItemsAsync<T>(List<T> items) where T : new()
         {
-            Debug.WriteLine($"💾 Saving {items.Count} items...");
+            Debug.WriteLine($"Saving {items.Count} items...");
             foreach (var item in items)
             {
                 await Database.InsertOrReplaceAsync(item);
             }
-            Debug.WriteLine("✅ Items saved successfully.");
+            Debug.WriteLine("Items saved successfully.");
         }
 
         public async Task<List<T>> GetAllItemsAsync<T>() where T : new()
@@ -73,7 +95,7 @@ namespace EventHub.Data
             return await Database.FindAsync<T>(id);
         }
 
-       
+
 
 
         public async Task DeleteItemAsync<T>(T item) where T : new()

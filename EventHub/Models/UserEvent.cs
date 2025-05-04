@@ -9,9 +9,6 @@ namespace EventHub.Models
 {
     public class UserEvent
     {
-        [PrimaryKey]
-        public int Id { get; set; }
-
         [Indexed]
         public int UserId { get; set; }
 
@@ -30,5 +27,7 @@ namespace EventHub.Models
 
         [Indexed]
         public bool IsSynced { get; set; }
+
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

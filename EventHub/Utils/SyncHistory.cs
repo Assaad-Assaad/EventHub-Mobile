@@ -12,5 +12,7 @@ namespace EventHub.Utils
         [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
         public DateTime SyncDate { get; set; }
+        public DateTime LastSyncTime { get; set; }
+        public string SyncType { get; set; } // e.g., "Full", "Incremental"
     }
 }

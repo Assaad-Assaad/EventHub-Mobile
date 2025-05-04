@@ -20,15 +20,28 @@ namespace EventHub.Api.Controllers
         [HttpPut("toggle-favorite/{eventId}")] //PUT api/user-events/toggle-favorite/{eventId}
         public async Task<ApiResult> ToggleFavorite(int eventId)
         {
-            var userId = UserId;
-            var result = await _userEventService.ToggleFavoritesAsync(userId, eventId);
-
-            if (!result.IsSuccess)
+            try
             {
-                return ApiResult.Fail("Faild Adding to favorite");
-            }
+                var userId = UserId;
+                Console.WriteLine($"Attempting to toggle favorite for event {eventId} by user {userId}");
 
-            return ApiResult.Success();
+                var result = await _userEventService.ToggleFavoritesAsync(userId, eventId);
+
+                if (!result.IsSuccess)
+                {
+                    Console.WriteLine($"Failed to toggle favorite");
+                    return ApiResult.Fail("");
+                }
+
+                Console.WriteLine($"Successfully toggled favorite for event {eventId} by user {userId}");
+                return ApiResult.Success();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in ToggleFavorite endpoint: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                return ApiResult.Fail($"An error occurred while toggling favorite: {ex.Message}");
+            }
         }
 
         // Sign In for an Event
@@ -75,7 +88,7 @@ namespace EventHub.Api.Controllers
         }
 
         // Get User Events
-        [HttpGet("")] // GET api/user-events
+        [HttpGet("{userId}")] // GET api/user-events
         public async Task<ApiResult<EventDto[]>> GetUserEvents()
         {
             var userId = UserId;

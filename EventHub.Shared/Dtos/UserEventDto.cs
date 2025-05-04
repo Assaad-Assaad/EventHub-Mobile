@@ -12,7 +12,7 @@ namespace EventHub.Shared.Dtos
 
         public int EventId { get; set; }
 
-       
+
 
         public bool IsFavorite { get; set; }
 

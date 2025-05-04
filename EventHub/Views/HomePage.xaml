@@ -135,11 +135,11 @@
         <!-- Activity Indicator -->
         <ActivityIndicator HeightRequest="30"
                            WidthRequest="30"
-                           HorizontalOptions="End"
+                           HorizontalOptions="Center"
                            IsRunning="{Binding IsBusy}"
                            Color="{StaticResource Primary}"
-                           VerticalOptions="End"/>
+                           VerticalOptions="Center"/>
 
-        
+       
     </Grid>
 </ContentPage>

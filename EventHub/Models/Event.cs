@@ -31,6 +31,9 @@ namespace EventHub.Models
         [MaxLength(200)]
         public string? Location { get; set; }
 
+        [Ignore]
+        public bool IsFavorite { get; set; }
+
 
         [Ignore]
         public List<UserEvent> UserEvents { get; set; } = new List<UserEvent>();
