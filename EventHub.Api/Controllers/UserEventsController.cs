@@ -16,33 +16,7 @@ namespace EventHub.Api.Controllers
             _userEventService = userEventService;
         }
 
-        // Toggle Favorite Status
-        [HttpPut("toggle-favorite/{eventId}")] //PUT api/user-events/toggle-favorite/{eventId}
-        public async Task<ApiResult> ToggleFavorite(int eventId)
-        {
-            try
-            {
-                var userId = UserId;
-                Console.WriteLine($"Attempting to toggle favorite for event {eventId} by user {userId}");
-
-                var result = await _userEventService.ToggleFavoritesAsync(userId, eventId);
-
-                if (!result.IsSuccess)
-                {
-                    Console.WriteLine($"Failed to toggle favorite");
-                    return ApiResult.Fail("");
-                }
-
-                Console.WriteLine($"Successfully toggled favorite for event {eventId} by user {userId}");
-                return ApiResult.Success();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error in ToggleFavorite endpoint: {ex.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
-                return ApiResult.Fail($"An error occurred while toggling favorite: {ex.Message}");
-            }
-        }
+       
 
         // Sign In for an Event
         [HttpPut("sign-in/{eventId}")] //PUT api/user-events/sign-in/{eventId}
@@ -59,7 +33,16 @@ namespace EventHub.Api.Controllers
             return ApiResult.Success();
         }
 
-        
+        [HttpPut("set-favorite/{eventId}")] // PUT api/user-events/set-favorite/{eventId}
+        public async Task<ApiResult> SetFavorite(int eventId, [FromBody] bool isFavorite)
+        {
+            var userId = UserId;
+            var result = await _userEventService.SetFavoriteAsync(userId, eventId, isFavorite);
+            return result;
+        }
+
+
+
         [HttpDelete("{eventId}")] // DELETE api/user-events/{eventId}
         public async Task<ApiResult> DeleteUserEvent(int eventId)
         {
@@ -99,5 +82,33 @@ namespace EventHub.Api.Controllers
             }
             return result;
         }
+
+        // Toggle Favorite Status
+        //[HttpPut("toggle-favorite/{eventId}")] //PUT api/user-events/toggle-favorite/{eventId}
+        //public async Task<ApiResult> ToggleFavorite(int eventId)
+        //{
+        //    try
+        //    {
+        //        var userId = UserId;
+        //        Console.WriteLine($"Attempting to toggle favorite for event {eventId} by user {userId}");
+
+        //        var result = await _userEventService.ToggleFavoritesAsync(userId, eventId);
+
+        //        if (!result.IsSuccess)
+        //        {
+        //            Console.WriteLine($"Failed to toggle favorite");
+        //            return ApiResult.Fail("");
+        //        }
+
+        //        Console.WriteLine($"Successfully toggled favorite for event {eventId} by user {userId}");
+        //        return ApiResult.Success();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine($"Error in ToggleFavorite endpoint: {ex.Message}");
+        //        Console.WriteLine($"Stack trace: {ex.StackTrace}");
+        //        return ApiResult.Fail($"An error occurred while toggling favorite: {ex.Message}");
+        //    }
+        //}
     }
 }

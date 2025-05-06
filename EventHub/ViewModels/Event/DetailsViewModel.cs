@@ -44,20 +44,27 @@ namespace EventHub.ViewModels.Event
                 return;
             }
 
-            if (SelectedEvent.IsFavorite)
+            // Toggle favorite in service (local DB + will sync later)
+            await _userEventService.ToggleFavoriteAsync(SelectedEvent.Id);
+
+            // Refresh favorite status from DB instead of assuming it changed
+            var userId = _authService.CurrentUser.Id;
+            var userEvent = await _userEventService.GetUserEventAsync(userId, SelectedEvent.Id);
+
+            IsFavorite = userEvent?.IsFavorite ?? false;
+
+            if (IsFavorite)
             {
-                await _userEventService.RemoveEventFromFavorites(SelectedEvent.Id);
-                SelectedEvent.IsFavorite = false;
+                await ShowToastAsync("Event added to favorites");
             }
             else
             {
-                await _userEventService.MarkEventAsFavorite(SelectedEvent.Id);
-                SelectedEvent.IsFavorite = true;
+                await ShowToastAsync("Event removed from favorites");
             }
         }
 
         [RelayCommand]
-        public async Task SignUpAsync()
+        public async Task SignForAsync()
         {
             if (SelectedEvent == null) return;
 
@@ -72,15 +79,9 @@ namespace EventHub.ViewModels.Event
             await ShowAlertAsync("Thank you", "You have successfully signed up for this event and we will see you there!", "OK");
         }
 
-        
-        
-            
-
-        
-            
-        }       
+    }       
 
       
 
-    }
+}
 

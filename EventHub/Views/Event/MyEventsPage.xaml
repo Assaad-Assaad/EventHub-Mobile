@@ -14,7 +14,7 @@
         <RefreshView Grid.Row="1"
                      Command="{Binding LoadEventsCommand}"
                      IsRefreshing="{Binding IsBusy}">
-            <CollectionView ItemsSource="{Binding FavoriteEvents}"
+            <CollectionView ItemsSource="{Binding Events}"
                           SelectionMode="None">
                 <CollectionView.EmptyView>
                     <StackLayout Padding="20">
@@ -26,31 +26,85 @@
                 </CollectionView.EmptyView>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="model:Event">
-                        <Grid Padding="10"
-                              ColumnDefinitions="*,Auto">
-                            <Border Grid.Column="0"
-                                   Padding="0"
-                                   Style="{StaticResource CardView}">
-                                <Grid Padding="10"
-                                      ColumnDefinitions="*,Auto">
-                                    <VerticalStackLayout Grid.Column="0"
-                                                       Spacing="5">
-                                        <Label Text="{Binding Title}"
-                                               Style="{StaticResource LargeLabel}"/>
-                                        <Label Text="{Binding Description}"
-                                               Style="{StaticResource MediumLabel}"
-                                               MaxLines="2"/>
-                                        <Label Text="{Binding Date, StringFormat='{0:MMM dd, yyyy}'}"
-                                               Style="{StaticResource SmallLabel}"/>
-                                    </VerticalStackLayout>
-                                    <Button Grid.Column="1"
-                                            Text="Remove"
-                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:MyEventsViewModel}}, Path=ToggleFavoriteCommand}"
-                                            CommandParameter="{Binding .}"
-                                            Style="{StaticResource PrimaryButton}"/>
+                        <SwipeView>
+                            <Border Stroke="LightGray" 
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 15"    
+                                BackgroundColor="White" 
+                                Padding="10" 
+                                Margin="5">
+                                <Grid ColumnDefinitions="120, 1, *" ColumnSpacing="5">
+
+                                    <Image Grid.Column="0"
+                                       Source="{Binding Image, TargetNullValue='placeholder.png'}"
+                                       Aspect="AspectFill"
+                                       WidthRequest="100"
+                                       HeightRequest="100"/>
+
+
+                                    <BoxView Grid.Column="1"
+                                         WidthRequest="0.5"
+                                         BackgroundColor="LightGray"/>
+
+
+                                    <Grid Grid.Column="2" RowDefinitions="Auto, *, Auto">
+
+                                        <Label Grid.Row="0" 
+                                           Text="{Binding Title}" 
+                                           FontSize="18" 
+                                           FontAttributes="Bold"
+                                           LineBreakMode="TailTruncation"/>
+
+
+                                        <Label Grid.Row="1" 
+                                           Text="{Binding Location, StringFormat='Location: {0}'}" 
+                                           VerticalOptions="Center"
+                                           FontSize="14" 
+                                           TextColor="Gray"
+                                           LineBreakMode="TailTruncation"/>
+
+
+                                        <Grid Grid.Row="2" ColumnDefinitions="*, Auto">
+                                            <Label Grid.Column="0" 
+                                               Text="{Binding Date, StringFormat='{}{0:dd/MM/yyyy}'}"
+                                               FontSize="14" 
+                                               Margin="0,5,0,0"
+                                               TextColor="Gray"/>
+                                            <Label Grid.Column="1"
+                                               Text="{Binding Category}" 
+                                               FontSize="14" 
+                                               TextColor="Blue"
+                                               HorizontalOptions="End"/>
+                                        </Grid>
+                                    </Grid>
                                 </Grid>
+
+
+
                             </Border>
-                        </Grid>
+
+                            <!-- Left swipe actions -->
+                            <SwipeView.LeftItems>
+                                <SwipeItems Mode="Execute">
+                                    <SwipeItem Text="Sign Up"
+                           IconImageSource="signup_icon.png"
+                           BackgroundColor="#4CAF50"
+                           Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:MyEventsViewModel}}, Path=SignForEventCommand}"
+                           CommandParameter="{Binding .}" />
+                                </SwipeItems>
+                            </SwipeView.LeftItems>
+
+                            <!-- Right swipe actions -->
+                            <SwipeView.RightItems>
+                                <SwipeItems Mode="Execute">
+                                    <SwipeItem Text="Delete"
+                           IconImageSource="trash_icon.png"
+                           BackgroundColor="Red"
+                           Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:MyEventsViewModel}}, Path=DeleteEventCommand}"
+                           CommandParameter="{Binding .}" />
+                                </SwipeItems>
+                            </SwipeView.RightItems>
+                        </SwipeView>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>

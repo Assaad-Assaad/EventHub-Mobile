@@ -113,90 +113,96 @@ namespace EventHub.Api.Services
             return ApiResult.Success();
         }
 
-        public async Task<ApiResult> ToggleFavoritesAsync(int userId, int eventId)
+        //public async Task<ApiResult> ToggleFavoritesAsync(int userId, int eventId)
+        //{
+        //    try
+        //    {
+        //        // Verify user exists
+        //        var user = await _context.Users.FindAsync(userId);
+        //        if (user == null)
+        //        {
+        //            return ApiResult.Fail("User not found");
+        //        }
+
+        //        // Verify event exists
+        //        var eventExists = await _context.Events.FindAsync(eventId);
+        //        if (eventExists == null)
+        //        {
+        //            return ApiResult.Fail("Event not found");
+        //        }
+
+        //        var userEvent = await _context.UserEvents
+        //            .FirstOrDefaultAsync(ue => ue.UserId == userId && ue.EventId == eventId);
+
+        //        if (userEvent != null)
+        //        {
+        //            // Toggle the favorite status
+        //            userEvent.IsFavorite = !userEvent.IsFavorite;
+        //            Console.WriteLine($"Toggling favorite status for user {userId} and event {eventId} to {userEvent.IsFavorite}");
+        //        }
+        //        else
+        //        {
+        //            // Create a new favorite record
+        //            userEvent = new UserEvent
+        //            {
+        //                UserId = userId,
+        //                EventId = eventId,
+        //                IsFavorite = true,
+        //                IsSignedIn = false
+        //            };
+        //            await _context.UserEvents.AddAsync(userEvent);
+        //            Console.WriteLine($"Creating new favorite record for user {userId} and event {eventId}");
+        //        }
+
+        //        await _context.SaveChangesAsync();
+        //        Console.WriteLine($"Successfully saved favorite status for user {userId} and event {eventId}");
+        //        return ApiResult.Success();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine($"Error in ToggleFavoritesAsync: {ex.Message}");
+        //        Console.WriteLine($"Stack trace: {ex.StackTrace}");
+        //        return ApiResult.Fail($"Failed to toggle favorite status: {ex.Message}");
+        //    }
+
+
+        //}
+
+
+        public async Task<ApiResult> SetFavoriteAsync(int userId, int eventId, bool isFavorite)
         {
             try
             {
-                // Verify user exists
-                var user = await _context.Users.FindAsync(userId);
-                if (user == null)
-                {
-                    return ApiResult.Fail("User not found");
-                }
-
-                // Verify event exists
-                var eventExists = await _context.Events.FindAsync(eventId);
-                if (eventExists == null)
-                {
-                    return ApiResult.Fail("Event not found");
-                }
-
                 var userEvent = await _context.UserEvents
                     .FirstOrDefaultAsync(ue => ue.UserId == userId && ue.EventId == eventId);
 
-                if (userEvent != null)
+                if (userEvent == null)
                 {
-                    // Toggle the favorite status
-                    userEvent.IsFavorite = !userEvent.IsFavorite;
-                    Console.WriteLine($"Toggling favorite status for user {userId} and event {eventId} to {userEvent.IsFavorite}");
-                }
-                else
-                {
-                    // Create a new favorite record
+                    if (!isFavorite) return ApiResult.Success();
+
                     userEvent = new UserEvent
                     {
                         UserId = userId,
                         EventId = eventId,
                         IsFavorite = true,
-                        IsSignedIn = false
+                        IsSignedIn = false 
                     };
                     await _context.UserEvents.AddAsync(userEvent);
-                    Console.WriteLine($"Creating new favorite record for user {userId} and event {eventId}");
+                }
+                else
+                {
+                    userEvent.IsFavorite = isFavorite;
                 }
 
                 await _context.SaveChangesAsync();
-                Console.WriteLine($"Successfully saved favorite status for user {userId} and event {eventId}");
                 return ApiResult.Success();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in ToggleFavoritesAsync: {ex.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
-                return ApiResult.Fail($"Failed to toggle favorite status: {ex.Message}");
-            }
-
-
-
-
-            /*
-             *  public async Task<ApiResult<List<Event>>> GetUserFavoriteEventsAsync(int userId)
-        {
-            try
-            {
-                var user = await _context.Users.FindAsync(userId);
-                if (user == null)
-                {
-                    return ApiResult<List<Event>>.Fail("User not found");
-                }
-
-                var userEvents = await _context.Events
-                    .Include(e => e.UserEvents)
-                    .Where(e => e.UserEvents.Any(ue => ue.UserId == userId))
-                    .ToListAsync();
-
-                return ApiResult<List<Event>>.Success(userEvents);
-            }
-            catch (Exception ex)
-            {
-                return ApiResult<List<Event>>.Fail($"An error occurred: {ex.Message}");
+                return ApiResult.Fail($"Failed to set favorite: {ex.Message}");
             }
         }
-             * 
-             * 
-             * 
-             * 
-             */
-        }
+
 
     }
 }

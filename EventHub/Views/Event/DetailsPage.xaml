@@ -46,6 +46,7 @@
                 VerticalOptions="Center">
                 <ImageButton Source="{Binding IsFavorite, Converter={StaticResource FavoriteIconConverter}}"
                        BackgroundColor="Transparent"
+                       AutomationId="FavoriteButton"
                        Command="{Binding ToggleFavoriteCommand}"/>
             </Border>
         </FlexLayout>
@@ -116,8 +117,8 @@
         <VerticalStackLayout Grid.Row="5" Spacing="20">
 
             <Button Style="{StaticResource btnPrimary}"
-                Text="Sign up" 
-                Command="{Binding SignUpCommand}"/>
+                Text="Sign for" 
+                Command="{Binding SignForCommand}"/>
         </VerticalStackLayout>
            
         

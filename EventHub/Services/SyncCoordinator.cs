@@ -5,6 +5,7 @@ using System.Net.Http.Json;
 using EventHub.Models;
 using EventHub.Utils;
 using System.Linq;
+using System.Text;
 
 namespace EventHub.Services
 {
@@ -116,102 +117,9 @@ namespace EventHub.Services
 
 
 
-       // sync user events from server to local database and vice versa
-       public async Task SyncUserEventsAsync()
-       {
-        if (!IsOnline())
-        {
-            Debug.WriteLine("Offline - skipping user event sync");
-            return;
-        }
+      
 
-        try
-        {
-            var token = await SecureStorage.GetAsync("auth_token");
-            if (string.IsNullOrEmpty(token)) return;
-
-            var userId = new TokenService().GetUserIdFromToken(token);
-            if (userId == 0) return;
-
-            Debug.WriteLine($"Starting user event sync for user {userId}...");
-
-            // Get local user events
-            var localUserEvents = await _context.GetItemsAsync<UserEvent>(ue => ue.UserId == userId);
-            Debug.WriteLine($"Found {localUserEvents.Count} local user events");
-
-            // Get server user events
-            var response = await _httpClient.GetAsync($"{AppConstants.BaseUrl}/api/user-events/{userId}");
-            if (!response.IsSuccessStatusCode)
-            {
-                Debug.WriteLine($"API request failed: {response.StatusCode}");
-                return;
-            }
-
-            var apiResult = await response.Content.ReadFromJsonAsync<ApiResult<UserEventDto[]>>();
-            var serverUserEvents = apiResult?.Data ?? Array.Empty<UserEventDto>();
-            Debug.WriteLine($"Retrieved {serverUserEvents.Length} user events from API");
-
-            // Delete local user events that don't exist on server
-            foreach (var localEvent in localUserEvents)
-            {
-                if (!serverUserEvents.Any(se => 
-                    se.UserId == localEvent.UserId && 
-                    se.EventId == localEvent.EventId))
-                {
-                    await _context.DeleteItemAsync(localEvent);
-                    Debug.WriteLine($"Deleted local user event for event {localEvent.EventId}");
-                }
-            }
-
-            // Add or update user events from server
-            foreach (var serverEvent in serverUserEvents)
-            {
-                var existing = localUserEvents.FirstOrDefault(le => 
-                    le.UserId == serverEvent.UserId && 
-                    le.EventId == serverEvent.EventId);
-
-                if (existing == null)
-                {
-                    var newUserEvent = new UserEvent
-                    {
-                        UserId = serverEvent.UserId,
-                        EventId = serverEvent.EventId,
-                        IsFavorite = serverEvent.IsFavorite,
-                        IsSignedIn = serverEvent.IsSignedIn,
-                        IsSynced = true,
-                        CreatedAt = DateTime.UtcNow
-                    };
-                    await _context.SaveItemAsync(newUserEvent);
-                    Debug.WriteLine($"Added new user event for event {serverEvent.EventId}");
-                }
-                else
-                {
-                    existing.IsFavorite = serverEvent.IsFavorite;
-                    existing.IsSignedIn = serverEvent.IsSignedIn;
-                    existing.IsSynced = true;
-                    await _context.SaveItemAsync(existing);
-                    Debug.WriteLine($"Updated user event for event {serverEvent.EventId}");
-                }
-            }
-
-            await _context.UpdateLastSyncTime(DateTime.UtcNow);
-            Debug.WriteLine("User event sync completed successfully");
-            MessagingCenter.Send(this, "UserEventsUpdated");
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"User event sync error: {ex.Message}");
-            Debug.WriteLine($"Stack trace: {ex.StackTrace}");
-        }
-    }    
-
-
-
-
-
-
-
-        public async Task SyncUserDataAsync()
+       public async Task SyncUserDataAsync()
         {
             try
             {
@@ -239,9 +147,71 @@ namespace EventHub.Services
             }
         }
 
+
+
         private bool IsOnline()
         {
             return Connectivity.Current.NetworkAccess == NetworkAccess.Internet;
+        }
+
+
+        public async Task SyncFavoritesAsync()
+        {
+            if (!IsOnline())
+            {
+                Debug.WriteLine("Offline - Skipping favorite sync.");
+                return;
+            }
+
+            Debug.WriteLine("Starting favorite sync...");
+
+            var token = await SecureStorage.GetAsync("auth_token");
+            if (string.IsNullOrEmpty(token))
+            {
+                Debug.WriteLine("No auth token found.");
+                return;
+            }
+
+            var userId = new TokenService().GetUserIdFromToken(token);
+            if (userId <= 0)
+            {
+                Debug.WriteLine("Invalid user ID from token.");
+                return;
+            }
+
+            try
+            {
+                // Get all local favorite records not yet synced
+                var localUserEvent = await _context.GetAllItemsAsync<UserEvent>();
+                var localFavorites = localUserEvent
+                    .Where(ue => ue.UserId == userId && ue.IsFavorite && !ue.IsSynced)
+                    .ToList();
+
+                foreach (var favorite in localFavorites)
+                {
+                    var url = $"{AppConstants.BaseUrl}/api/user-events/set-favorite/{favorite.EventId}";
+
+                    var content = new StringContent(favorite.IsFavorite.ToString(), Encoding.UTF8, "application/json");
+
+                    var response = await _httpClient.PutAsync(url, content);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        // Mark as synced in local DB
+                        favorite.IsSynced = true;
+                        await _context.SaveItemAsync(favorite);
+                        Debug.WriteLine($" Synced favorite status for event {favorite.EventId}");
+                    }
+                    else
+                    {
+                        Debug.WriteLine($" Failed to sync favorite for event {favorite.EventId}: {response.ReasonPhrase}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error syncing favorites: {ex.Message}");
+            }
         }
     }
 }

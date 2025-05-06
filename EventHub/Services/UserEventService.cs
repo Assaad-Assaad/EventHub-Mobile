@@ -23,59 +23,68 @@ namespace EventHub.Services
             _eventsService = eventsService;
         }
 
-
-
-
-        
-    
-
-        
-        
-        
         // Mark an event as favorite
         public async Task MarkEventAsFavorite(int eventId)
         {
             var userId = _authService.CurrentUser?.Id ?? 0;
-            if (userId == 0)
-            {
-                throw new InvalidOperationException("No user is currently logged in");
-            }
+            if (userId == 0) throw new InvalidOperationException("No user logged in");
 
             var userEvent = await _context.GetItemAsync<UserEvent>(ue => ue.UserId == userId && ue.EventId == eventId);
+
             if (userEvent == null)
             {
                 userEvent = new UserEvent
                 {
                     UserId = userId,
                     EventId = eventId,
-                    IsFavorite = true
+                    IsFavorite = true,
+                    IsSignedIn = false,
+                    IsSynced = false
                 };
-                await _context.SaveItemAsync(userEvent);
-
             }
             else
             {
+                // Only update if needed
+                if (userEvent.IsFavorite) return;
+
                 userEvent.IsFavorite = true;
-                await _context.SaveItemAsync(userEvent);
+                userEvent.IsSynced = false;
             }
-        }  
+
+            await _context.SaveItemAsync(userEvent);
+        }
 
         // Remove an event from favorites
-        public async Task RemoveEventFromFavorites(int eventId)     
+        public async Task RemoveEventFromFavorites(int eventId)
         {
             var userId = _authService.CurrentUser?.Id ?? 0;
-            if (userId == 0)
-            {
-                throw new InvalidOperationException("No user is currently logged in");
-            }
+            if (userId == 0) throw new InvalidOperationException("No user logged in");
+
             var userEvent = await _context.GetItemAsync<UserEvent>(ue => ue.UserId == userId && ue.EventId == eventId);
+
             if (userEvent == null)
             {
-                throw new InvalidOperationException("Event not found");
+                userEvent = new UserEvent
+                {
+                    UserId = userId,
+                    EventId = eventId,
+                    IsFavorite = false,
+                    IsSignedIn = false,
+                    IsSynced = false
+                };
             }
-            await _context.DeleteItemAsync(userEvent);
+            else
+            {
+                if (!userEvent.IsFavorite) return;
+
+                userEvent.IsFavorite = false;
+                userEvent.IsSynced = false;
+            }
+
+            await _context.SaveItemAsync(userEvent);
         }
-       
+
+
         // Get favorite events
         public async Task<List<UserEvent>> GetFavoriteEvents()
         {
@@ -89,10 +98,46 @@ namespace EventHub.Services
                 ue.IsFavorite == true);
         }
 
-      
+        // Get favorite events with details
+        public async Task<List<Event>> GetFavoriteEventsWithDetails()
+        {
+            var userId = _authService.CurrentUser?.Id ?? 0;
+            if (userId == 0)
+                throw new InvalidOperationException("No user is currently logged in");
 
-      
+            var favoriteLinks = await _context.GetItemsAsync<UserEvent>(
+                ue => ue.UserId == userId && ue.IsFavorite);
 
-      
+            var eventIds = favoriteLinks.Select(f => f.EventId).ToList();
+            return await _context.GetItemsAsync<Event>(e => eventIds.Contains(e.Id));
+        }
+
+
+        // Toggle favorite status
+        public async Task<bool> ToggleFavoriteAsync(int eventId)
+        {
+            var userId = _authService.CurrentUser?.Id ?? 0;
+            if (userId == 0) throw new InvalidOperationException("No user logged in");
+
+            var userEvent = await _context.GetItemAsync<UserEvent>(ue =>
+                ue.UserId == userId && ue.EventId == eventId);
+
+            if (userEvent == null || !userEvent.IsFavorite)
+            {
+                await MarkEventAsFavorite(eventId);
+                return true;
+            }
+            else
+            {
+                await RemoveEventFromFavorites(eventId);
+                return false;
+            }
+        }
+
+
+        public async Task<UserEvent> GetUserEventAsync(int userId, int eventId)
+        {
+            return await _context.GetItemAsync<UserEvent>(ue => ue.UserId == userId && ue.EventId == eventId);
+        }
     }
 }
