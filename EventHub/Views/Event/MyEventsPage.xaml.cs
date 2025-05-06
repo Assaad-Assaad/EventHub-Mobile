@@ -13,16 +13,16 @@ public partial class MyEventsPage : ContentPage
     }
 
 
-    //protected override async void OnNavigatedTo(NavigatedToEventArgs args)
-    //{
-    //    base.OnNavigatedTo(args);
-
-    //    await _myEventsViewModel.InitializeAsync();
-    //}
-
-    protected override async void OnAppearing()
+    protected override async void OnNavigatedTo(NavigatedToEventArgs args)
     {
-        base.OnAppearing();
+        base.OnNavigatedTo(args);
+
         await _myEventsViewModel.InitializeAsync();
     }
+
+    //protected override async void OnAppearing()
+    //{
+    //    base.OnAppearing();
+    //    await _myEventsViewModel.InitializeAsync();
+    //}
 }

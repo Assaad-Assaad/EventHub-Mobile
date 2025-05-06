@@ -7,6 +7,8 @@ using EventHub.Views;
 using EventHub.Views.Event;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Threading.Tasks;
+using Microsoft.Maui.Controls;
 
 
 namespace EventHub.ViewModels.Event
@@ -43,81 +45,118 @@ namespace EventHub.ViewModels.Event
         [RelayCommand]
         public async Task LoadFavoriteEventsAsync()
         {
-            await RunBusyActionAsync(async () =>
+            if (_authService.CurrentUser == null)
             {
-                if (_authService.CurrentUser == null)
-                {
-                    await Shell.Current.DisplayAlert("Error", "Please log in to view your events", "OK");
-                    return;
-                }
-                if (IsOnline())
-                {
-                    Debug.WriteLine("Syncing events from API to local DB...");
-                    await _syncCoordinator.SyncFavoritesAsync();
-                    Debug.WriteLine("Sync completed.");
-                }
-                else
-                {
-                    Debug.WriteLine("No internet. Loading events from local DB...");
-                }
+                await Shell.Current.DisplayAlert("Error", "Please log in to view your events", "OK");
+                return;
+            }
+
+            if (IsBusy) return;
+            IsBusy = true;
+
+            try
+            {
+
                 var userEvents = await _userEventService.GetFavoriteEvents();
+
+
+                if (Connectivity.Current.NetworkAccess == NetworkAccess.Internet)
+                {
+                    await _syncCoordinator.SyncFavoritesAsync();
+                }
+
+                // Load events from local DB, not API
+                var localEvents = await _eventsService.GetAllEventsAsync(); // Should be local-only
+                var eventsDict = localEvents.ToDictionary(e => e.Id);
+
                 FavoriteEvents.Clear();
+
                 foreach (var userEvent in userEvents)
                 {
-                    var evt = await _eventsService.GetEventByIdAsync(userEvent.EventId);
-                    if (evt != null)
+                    if (eventsDict.TryGetValue(userEvent.EventId, out var evt))
                     {
                         FavoriteEvents.Add(evt);
                     }
                 }
+
                 NoEventsAvailable = !FavoriteEvents.Any();
-            }, requireOnline: false);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error loading events: {ex.Message}");
+                await Shell.Current.DisplayAlert("Error", "Could not load your events.", "OK");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
 
         [RelayCommand]
         public async Task SignForEventAsync(Models.Event @event)
         {
-            await RunBusyActionAsync(async () =>
-            {
-                if (_authService.CurrentUser == null)
+           
+                try
                 {
-                    await ShowAlertAsync("Error", "Please log in to sign up for events", "OK");
-                    return;
+                    if (_authService.CurrentUser == null)
+                    {
+                        await ShowAlertAsync("Error", "Please log in to sign up for events", "OK");
+                        return;
+                    }
+
+                    var confirm = await Shell.Current.DisplayAlert(
+                        "Sign Up",
+                        $"Are you sure you want to sign up for '{@event.Title}'?",
+                        "Yes", "No");
+
+                    if (confirm)
+                    {
+                        await _userEventService.RemoveEventFromFavorites(@event.Id);
+                        await ShowAlertAsync("Thank You",
+                            "You have successfully signed up for this event and we will see you there!", "OK");
+                        
+                        
+                        await LoadFavoriteEventsAsync();
+                    }
                 }
-                var confirm = await Shell.Current.DisplayAlert(
-                    "Sign Up",
-                    $"Are you sure you want to sign up for '{@event.Title}'?",
-                    "Yes", "No");
-                if (confirm)
+                catch (Exception ex)
                 {
-                    await ShowAlertAsync("Thank You",
-                        "You have successfully signed up for this event and we will see you there!", "OK");
-                    await _userEventService.RemoveEventFromFavorites(@event.Id);
-                    await LoadFavoriteEventsAsync();
+                    Debug.WriteLine($"Error signing up for event: {ex.Message}");
+                    await Shell.Current.DisplayAlert("Error", "Could not sign up for the event.", "OK");
                 }
-            }, requireOnline: false);
+            
         }
 
 
         [RelayCommand]
         public async Task DeleteEventAsync(Models.Event @event)
         {
-           await RunBusyActionAsync(async () =>
-            {
-                if (_authService.CurrentUser == null)
+           
+                try
                 {
-                    await ShowAlertAsync("Error", "Please log in to delete events", "OK");
-                    return;
+                    if (_authService.CurrentUser == null)
+                    {
+                        await ShowAlertAsync("Error", "Please log in to delete events", "OK");
+                        return;
+                    }
+
+                    var result = await Shell.Current.DisplayAlert("Delete Event",
+                        "Are you sure you want to delete this event?", "Yes", "No");
+
+                    if (result)
+                    {
+                        await _userEventService.RemoveEventFromFavorites(@event.Id);
+                        // Ensure UI updates immediately
+                        await LoadFavoriteEventsAsync();
+                    }
                 }
-                var result = await Shell.Current.DisplayAlert("Delete Event",
-                    "Are you sure you want to delete this event?", "Yes", "No");
-                if (result)
+                catch (Exception ex)
                 {
-                    await _userEventService.RemoveEventFromFavorites(@event.Id);
-                    await LoadFavoriteEventsAsync(); // Or remove directly from collection
+                    Debug.WriteLine($"Error deleting event: {ex.Message}");
+                    await Shell.Current.DisplayAlert("Error", "Could not delete the event.", "OK");
                 }
-            }, requireOnline: false);
+            
         }
 
         public async Task InitializeAsync()
@@ -131,105 +170,6 @@ namespace EventHub.ViewModels.Event
 
 
 
-
-        //[RelayCommand]
-        //public async Task LoadFavoriteEventsAsync()
-        //{
-        //    if (_authService.CurrentUser == null)
-        //    {
-        //        await Shell.Current.DisplayAlert("Error", "Please log in to view your events", "OK");
-        //        return;
-        //    }
-
-        //    if (IsBusy) return;
-        //    IsBusy = true;
-
-        //    try
-        //    {
-
-        //        var userEvents = await _userEventService.GetFavoriteEvents();
-
-
-        //        if (IsOnline())
-        //        {
-        //            await _syncCoordinator.SyncFavoritesAsync();
-        //        }
-
-        //        // Load events from local DB, not API
-        //        var localEvents = await _eventsService.GetAllEventsAsync(); // Should be local-only
-        //        var eventsDict = localEvents.ToDictionary(e => e.Id);
-
-        //        FavoriteEvents.Clear();
-
-        //        foreach (var userEvent in userEvents)
-        //        {
-        //            if (eventsDict.TryGetValue(userEvent.EventId, out var evt))
-        //            {
-        //                FavoriteEvents.Add(evt);
-        //            }
-        //        }
-
-        //        NoEvents = !FavoriteEvents.Any();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Debug.WriteLine($"Error loading events: {ex.Message}");
-        //        await Shell.Current.DisplayAlert("Error", "Could not load your events.", "OK");
-        //    }
-        //    finally
-        //    {
-        //        IsBusy = false;
-        //    }
-        //}
-
-
-        //[RelayCommand]
-        //public async Task SignForEventAsync(Models.Event @event)
-        //{
-        //    if (_authService.CurrentUser == null)
-        //    {
-        //        await Shell.Current.DisplayAlert("Error", "Please log in to sign up for events", "OK");
-        //        return;
-        //    }
-
-        //    var confirm = await Shell.Current.DisplayAlert(
-        //        "Sign Up",
-        //        $"Are you sure you want to sign up for '{@event.Title}'?",
-        //        "Yes", "No");
-
-        //    if (confirm)
-        //    {
-
-        //        await ShowAlertAsync("Thank You",
-        //            "You have successfully signed up for this event and we will see you there!", "OK");
-
-
-        //        await _userEventService.RemoveEventFromFavorites(@event.Id);
-
-
-        //        await LoadFavoriteEventsAsync();
-        //    }
-        //}
-
-
-        //[RelayCommand]
-        //public async Task DeleteEventAsync(Models.Event @event)
-        //{
-        //    if (_authService.CurrentUser == null)
-        //    {
-        //        await Shell.Current.DisplayAlert("Error", "Please log in to delete events", "OK");
-        //        return;
-        //    }
-
-        //    var result = await Shell.Current.DisplayAlert("Delete Event",
-        //        "Are you sure you want to delete this event?", "Yes", "No");
-
-        //    if (result)
-        //    {
-        //        await _userEventService.RemoveEventFromFavorites(@event.Id);
-        //        await LoadFavoriteEventsAsync(); // Or remove directly from collection
-        //    }
-        //}
 
 
 
