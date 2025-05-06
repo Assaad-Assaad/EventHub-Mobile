@@ -35,7 +35,7 @@
 
         <!-- Event List with RefreshView -->
         <RefreshView Grid.Row="2"
-                 Command="{Binding RefreshCommand}"
+                 Command="{Binding LoadAllEventsCommand}"
                  IsRefreshing="{Binding IsBusy}">
             <CollectionView ItemsSource="{Binding AllEvents}"
                         SelectionMode="None">

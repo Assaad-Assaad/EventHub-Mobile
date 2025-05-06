@@ -120,8 +120,15 @@
                 Text="Sign for" 
                 Command="{Binding SignForCommand}"/>
         </VerticalStackLayout>
-           
-        
+
+        <!-- Activity Indicator -->
+        <ActivityIndicator HeightRequest="30"
+                   WidthRequest="30"
+                   HorizontalOptions="Center"
+                   IsRunning="{Binding IsBusy}"
+                   Color="{StaticResource Primary}"
+                   VerticalOptions="Center"/>
+
 
     </Grid>
 

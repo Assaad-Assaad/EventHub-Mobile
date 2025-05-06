@@ -9,6 +9,13 @@ namespace EventHub.ViewModels
         [ObservableProperty]
         private bool _isBusy;
 
+
+
+        public BaseViewModel()
+        {
+            
+        }
+
         protected async Task RunBusyActionAsync(Func<Task> action, string errorMessage = "Something went wrong.", bool requireOnline = false)
         {
             if (requireOnline && !IsOnline())
@@ -36,33 +43,7 @@ namespace EventHub.ViewModels
             }
         }
 
-        protected async Task<T> RunBusyFunctionAsync<T>(Func<Task<T>> action, string errorMessage = "Something went wrong.", bool requireOnline = false)
-        {
-            if (requireOnline && !IsOnline())
-            {
-                await ShowAlertAsync("No Internet", "An internet connection is required.", "OK");
-                return default;
-            }
-
-            if (IsBusy)
-                return default;
-
-            try
-            {
-                IsBusy = true;
-                return await action();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"❌ {errorMessage}: {ex.Message}");
-                await ShowAlertAsync("Error", errorMessage, "OK");
-                return default;
-            }
-            finally
-            {
-                IsBusy = false;
-            }
-        }
+    
 
         public bool IsOnline() => Connectivity.Current.NetworkAccess == NetworkAccess.Internet;
 
@@ -80,5 +61,8 @@ namespace EventHub.ViewModels
 
         public async Task<bool> ShowConfirmAsync(string title, string message, string okButtonText, string cancelButtonText) =>
             await Shell.Current.DisplayAlert(title, message, okButtonText, cancelButtonText);
+
+
+        
     }
 }

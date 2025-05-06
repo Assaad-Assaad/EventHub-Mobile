@@ -20,9 +20,9 @@ public partial class ProfilePage : ContentPage
     {
         switch (optionText)
         {
-            case "My Events":
+            case "My FavoriteEvents":
                // Shell.Current.GoToAsync($"//{nameof(MyEventsPage)}");
-               await _profileViewModel.ShowToastAsync("My Events Clicked");
+               await _profileViewModel.ShowToastAsync("My FavoriteEvents Clicked");
                 break;
             
         }

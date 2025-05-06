@@ -39,10 +39,11 @@ namespace EventHub.ViewModels.Event
         {
             _eventService = eventsService;
             _syncCoordinator = syncCoordinator;
+           
         }
 
         [RelayCommand]
-        private async Task LoadEventsAsync()
+        private async Task LoadAllEventsAsync()
         {
             await RunBusyActionAsync(async () =>
             {
@@ -92,24 +93,24 @@ namespace EventHub.ViewModels.Event
             if (_isInitialized) return;
             _isInitialized = true;
 
-            await LoadEventsAsync();
+            await LoadAllEventsAsync();
         }
 
 
 
         partial void OnSearchTextChanged(string value)
         {
-            LoadEventsCommand.Execute(null);
+            LoadAllEventsCommand.Execute(null);
         }
 
         partial void OnSelectedCategoryChanged(string value)
         {
-            LoadEventsCommand.Execute(null);
+            LoadAllEventsCommand.Execute(null);
         }
 
         partial void OnSelectedDateChanged(string value)
         {
-            LoadEventsCommand.Execute(null);
+            LoadAllEventsCommand.Execute(null);
         }
     }
 

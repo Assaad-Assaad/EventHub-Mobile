@@ -49,7 +49,7 @@ namespace EventHub.ViewModels
             MessagingCenter.Subscribe<SyncCoordinator>(
                 this,
                 "EventsUpdated",
-                async (sender) => await LoadEventsAsync()
+                async (sender) => await LoadRecentEventsAsync()
             );
 
             // Load initial state
@@ -95,11 +95,11 @@ namespace EventHub.ViewModels
             if (_isInitialized) return;
             _isInitialized = true;
 
-            await LoadEventsAsync();
+            await LoadRecentEventsAsync();
         }
 
         [RelayCommand]
-        private async Task LoadEventsAsync()
+        private async Task LoadRecentEventsAsync()
         {
             await RunBusyActionAsync(async () =>
             {

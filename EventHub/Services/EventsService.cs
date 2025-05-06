@@ -13,7 +13,7 @@ namespace EventHub.Services
     {
         private readonly HttpClient _httpClient;
         private readonly DatabaseContext _context;
-        private bool IsOnline() => Connectivity.Current.NetworkAccess == NetworkAccess.Internet;
+       // private bool IsOnline() => Connectivity.Current.NetworkAccess == NetworkAccess.Internet;
 
 
         public EventsService(HttpClient httpClient, DatabaseContext context)

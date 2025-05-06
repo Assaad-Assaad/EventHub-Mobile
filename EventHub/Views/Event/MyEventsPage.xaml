@@ -12,9 +12,9 @@
 
     <Grid RowDefinitions="Auto,*">
         <RefreshView Grid.Row="1"
-                     Command="{Binding LoadEventsCommand}"
+                     Command="{Binding LoadFavoriteEventsCommand}"
                      IsRefreshing="{Binding IsBusy}">
-            <CollectionView ItemsSource="{Binding Events}"
+            <CollectionView ItemsSource="{Binding FavoriteEvents}"
                           SelectionMode="None">
                 <CollectionView.EmptyView>
                     <StackLayout Padding="20">
@@ -109,5 +109,7 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
         </RefreshView>
+        
+        
     </Grid>
 </ContentPage>
