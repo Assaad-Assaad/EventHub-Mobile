@@ -1,16 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using EventHub.Data;
-using EventHub.Models;
-using EventHub.Services;
-using EventHub.Shared.Dtos;
-using EventHub.Utils;
-using EventHub.Views;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 
 namespace EventHub.ViewModels
 {
@@ -82,7 +70,7 @@ namespace EventHub.ViewModels
             }
         }
 
-        private void LoadUserData()
+        public void LoadUserData()
         {
             var user = _authService.CurrentUser;
             if (user != null)
@@ -98,5 +86,29 @@ namespace EventHub.ViewModels
                 Email = string.Empty;
             }
         }
+
+       
+
+
+        [RelayCommand]
+        public async Task GoToMyEventsAsync(string rowText)
+        {
+            switch (rowText)
+            {
+                case "My Events":
+                    await Shell.Current.GoToAsync($"//{nameof(MyEventsPage)}");
+                    break;
+                case "Name":
+                    // Handle name-related action
+                    break;
+                case "Email":
+                    // Handle email-related action
+                    break;
+                    // Add more cases as needed
+            }
+        }
+
+
     }
+
 }

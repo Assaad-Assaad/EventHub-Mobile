@@ -1,12 +1,4 @@
-﻿using CommunityToolkit.Maui.Alerts;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using EventHub.Models;
-using EventHub.Services;
-using EventHub.Shared.Dtos;
-using EventHub.Views;
-using System.ComponentModel.Design;
-using System.Diagnostics;
+﻿
 
 
 

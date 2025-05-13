@@ -1,14 +1,4 @@
-﻿using EventHub.Data;
-using EventHub.Models;
-using EventHub.Shared.Dtos;
-using EventHub.Utils;
-using EventHub.Views;
-using Microsoft.Extensions.Configuration;
-using System.Diagnostics;
-using System.IdentityModel.Tokens.Jwt;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
-
+﻿
 namespace EventHub.Services
 {
     public class AuthService

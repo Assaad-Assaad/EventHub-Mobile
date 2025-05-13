@@ -1,25 +1,18 @@
-﻿using EventHub.Data;
-using EventHub.Models;
-using EventHub.Shared.Dtos;
-using EventHub.Utils;
-
-using System.Diagnostics;
-using System.Net.Http.Json;
-
+﻿
 
 namespace EventHub.Services
 {
     public class EventsService
     {
-        private readonly HttpClient _httpClient;
+        
         private readonly DatabaseContext _context;
-       // private bool IsOnline() => Connectivity.Current.NetworkAccess == NetworkAccess.Internet;
+       
 
 
-        public EventsService(HttpClient httpClient, DatabaseContext context)
+        public EventsService(DatabaseContext context)
         {
-            _httpClient = httpClient;
-            _context = context;
+            
+           _context = context;
         }
 
 

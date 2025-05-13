@@ -4,8 +4,8 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="EventHub.Controls.PofileOptionRow"
              x:Name="this">
-    
-    
+
+
     <Grid 
         BindingContext="{x:Reference this}"
         RowDefinitions="*, Auto" 
@@ -32,8 +32,11 @@
                          HeightRequest="1"
                          Color="{StaticResource Primary}"
                          Opacity="0.25" />
+
         <Grid.GestureRecognizers>
-            <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" />
+            <TapGestureRecognizer Command="{Binding BindingContext.GoToMyEventsCommand, Source={x:Reference this}}" CommandParameter="{Binding Text}" />
         </Grid.GestureRecognizers>
+
     </Grid>
 </ContentView>
+

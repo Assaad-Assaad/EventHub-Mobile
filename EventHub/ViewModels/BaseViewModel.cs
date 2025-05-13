@@ -1,6 +1,5 @@
-﻿using CommunityToolkit.Maui.Alerts;
-using CommunityToolkit.Mvvm.ComponentModel;
-using System.Diagnostics;
+﻿
+
 
 namespace EventHub.ViewModels
 {

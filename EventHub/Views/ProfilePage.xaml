@@ -41,7 +41,8 @@
             Grid.Row="1" 
             Spacing="10" 
             Padding="15">
-            <controls:PofileOptionRow Text="My Events" />
+            <controls:PofileOptionRow Text="My Events"
+                                      />
             <controls:PofileOptionRow Text="{Binding Name}" />
             <controls:PofileOptionRow Text="{Binding Email}" />
 

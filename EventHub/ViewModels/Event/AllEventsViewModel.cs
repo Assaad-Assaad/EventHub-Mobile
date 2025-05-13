@@ -1,13 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-
-using EventHub.Services;
-
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using EventHub.Models;
-using EventHub.Utils;
-using EventHub.Views.Event;
+﻿
 
 
 
@@ -33,7 +24,7 @@ namespace EventHub.ViewModels.Event
         [ObservableProperty]
         private string _selectedDate;
 
-        private bool _isInitialized;
+        
 
         public AllEventsViewModel(EventsService eventsService, SyncCoordinator syncCoordinator)
         {
@@ -43,7 +34,7 @@ namespace EventHub.ViewModels.Event
         }
 
         [RelayCommand]
-        private async Task LoadAllEventsAsync()
+        public async Task LoadAllEventsAsync()
         {
             await RunBusyActionAsync(async () =>
             {
@@ -88,13 +79,7 @@ namespace EventHub.ViewModels.Event
 
 
 
-        public async Task InitializeAsync()
-        {
-            if (_isInitialized) return;
-            _isInitialized = true;
-
-            await LoadAllEventsAsync();
-        }
+        
 
 
 

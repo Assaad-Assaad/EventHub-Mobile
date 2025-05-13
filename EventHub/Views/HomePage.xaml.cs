@@ -1,4 +1,4 @@
-using EventHub.ViewModels;
+
 
 namespace EventHub.Views;
 
@@ -16,7 +16,7 @@ public partial class HomePage : ContentPage
     protected override async void OnNavigatedTo(NavigatedToEventArgs args)
     {
         base.OnNavigatedTo(args);
-        await _homeViewModel.InitializeAsync();
+        await _homeViewModel.LoadRecentEventsAsync();
     }
 
 

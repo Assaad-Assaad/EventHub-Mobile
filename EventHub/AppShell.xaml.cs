@@ -1,5 +1,4 @@
-﻿using EventHub.Views;
-using EventHub.Views.Event;
+﻿
 
 namespace EventHub
 {

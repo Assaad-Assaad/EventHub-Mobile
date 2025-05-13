@@ -1,6 +1,4 @@
-using EventHub.ViewModels;
-using EventHub.Views.Event;
-using System.Threading.Tasks;
+
 
 namespace EventHub.Views;
 
@@ -16,16 +14,10 @@ public partial class ProfilePage : ContentPage
 
     }
 
-    private async Task ProfileOptionRow_Tapped(object sender, string optionText)
+    protected override void OnNavigatedTo(NavigatedToEventArgs args)
     {
-        switch (optionText)
-        {
-            case "My FavoriteEvents":
-               // Shell.Current.GoToAsync($"//{nameof(MyEventsPage)}");
-               await _profileViewModel.ShowToastAsync("My FavoriteEvents Clicked");
-                break;
-            
-        }
+        base.OnNavigatedTo(args);
+        _profileViewModel.LoadUserData();
     }
 
 }

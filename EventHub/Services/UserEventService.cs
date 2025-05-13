@@ -1,10 +1,5 @@
-﻿using EventHub.Data;
-using EventHub.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+
 
 namespace EventHub.Services
 {
@@ -14,13 +9,15 @@ namespace EventHub.Services
         private readonly HttpClient _httpClient;
         private readonly AuthService _authService;
         private readonly EventsService _eventsService;
+        private readonly SyncCoordinator _syncCoordinator;
 
-        public UserEventService(DatabaseContext context, HttpClient httpClient, AuthService authService, EventsService eventsService)
+        public UserEventService(DatabaseContext context, HttpClient httpClient, AuthService authService, EventsService eventsService, SyncCoordinator syncCoordinator)
         {
             _context = context;
             _httpClient = httpClient;
             _authService = authService;
             _eventsService = eventsService;
+            _syncCoordinator = syncCoordinator;
         }
 
         // Mark an event as favorite
@@ -122,16 +119,33 @@ namespace EventHub.Services
             var userEvent = await _context.GetItemAsync<UserEvent>(ue =>
                 ue.UserId == userId && ue.EventId == eventId);
 
+            bool isFavorite;
             if (userEvent == null || !userEvent.IsFavorite)
             {
                 await MarkEventAsFavorite(eventId);
-                return true;
+                isFavorite = true;
             }
             else
             {
                 await RemoveEventFromFavorites(eventId);
-                return false;
+                isFavorite = false;
             }
+
+            // Trigger sync if online
+            if (Connectivity.Current.NetworkAccess == NetworkAccess.Internet)
+            {
+                try
+                {
+                    await _syncCoordinator.SyncFavoritesAsync();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error syncing favorites after toggle: {ex.Message}");
+                    // Don't throw, as the local change was successful
+                }
+            }
+
+            return isFavorite;
         }
 
 

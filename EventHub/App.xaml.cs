@@ -1,7 +1,4 @@
-﻿using EventHub.Data;
-using EventHub.Services;
-using EventHub.Views;
-using Microsoft.Extensions.DependencyInjection;
+﻿
 
 namespace EventHub
 {

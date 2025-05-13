@@ -35,7 +35,7 @@ namespace EventHub.Api.Services
             var jwtSecurityToken = new JwtSecurityToken(
                 issuer: _configuration.GetValue<string>("Jwt:Issuer"),
                 claims: claims,
-                expires: DateTime.UtcNow.AddDays(7),
+                expires: DateTime.UtcNow.AddHours(1),
                 signingCredentials: signingCredentials
             );
 

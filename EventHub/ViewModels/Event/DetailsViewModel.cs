@@ -1,10 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using EventHub.Models;
-using EventHub.Services;
-using EventHub.Views;
-using System.Collections.Specialized;
-using System.Diagnostics;
+﻿
 
 namespace EventHub.ViewModels.Event
 {
@@ -35,7 +29,11 @@ namespace EventHub.ViewModels.Event
         [RelayCommand]
         public async Task ToggleFavoriteAsync()
         {
-            
+            if (IsBusy) return;
+            IsBusy = true;
+
+            try
+            {
                 if (SelectedEvent == null) return;
                 if (_authService.CurrentUser == null)
                 {
@@ -44,11 +42,10 @@ namespace EventHub.ViewModels.Event
                     return;
                 }
                 
-                await _userEventService.ToggleFavoriteAsync(SelectedEvent.Id);
+                // Toggle favorite status and get the new state
+                IsFavorite = await _userEventService.ToggleFavoriteAsync(SelectedEvent.Id);
                 
-                var userId = _authService.CurrentUser.Id;
-                var userEvent = await _userEventService.GetUserEventAsync(userId, SelectedEvent.Id);
-                IsFavorite = userEvent?.IsFavorite ?? false;
+                // Show appropriate message
                 if (IsFavorite)
                 {
                     await ShowToastAsync("Event added to favorites");
@@ -57,7 +54,16 @@ namespace EventHub.ViewModels.Event
                 {
                     await ShowToastAsync("Event removed from favorites");
                 }
-            
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error toggling favorite: {ex.Message}");
+                await Shell.Current.DisplayAlert("Error", "Could not update favorite status", "OK");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         [RelayCommand]
@@ -77,53 +83,6 @@ namespace EventHub.ViewModels.Event
             });
         }
 
-
-        //[RelayCommand]
-        //public async Task ToggleFavoriteAsync()
-        //{
-        //    if (SelectedEvent == null) return;
-
-        //    if (_authService.CurrentUser == null)
-        //    {
-        //        await Shell.Current.DisplayAlert("Error", "Please log in to favorite events", "OK");
-        //        await Shell.Current.GoToAsync($"//{nameof(AuthPage)}");
-        //        return;
-        //    }
-
-        //    
-        //    await _userEventService.ToggleFavoriteAsync(SelectedEvent.Id);
-
-        //    
-        //    var userId = _authService.CurrentUser.Id;
-        //    var userEvent = await _userEventService.GetUserEventAsync(userId, SelectedEvent.Id);
-
-        //    IsFavorite = userEvent?.IsFavorite ?? false;
-
-        //    if (IsFavorite)
-        //    {
-        //        await ShowToastAsync("Event added to favorites");
-        //    }
-        //    else
-        //    {
-        //        await ShowToastAsync("Event removed from favorites");
-        //    }
-        //}
-
-        //[RelayCommand]
-        //public async Task SignForAsync()
-        //{
-        //    if (SelectedEvent == null) return;
-
-        //    if (_authService.CurrentUser == null)
-        //    {
-        //        await Shell.Current.DisplayAlert("Error", "Please log in to sign up for events", "OK");
-        //        await Shell.Current.GoToAsync($"//{nameof(AuthPage)}");
-        //        return;
-        //    }
-
-        //    // here I just want to show a thank you message i do not want to make any changes to the database
-        //    await ShowAlertAsync("Thank you", "You have successfully signed up for this event and we will see you there!", "OK");
-        //}
 
 
     }       

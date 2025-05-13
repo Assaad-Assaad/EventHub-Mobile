@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.Input;
 using EventHub.Services;
-using EventHub.ViewModels;
+
 
 namespace EventHub.Views;
 
@@ -28,8 +28,6 @@ public partial class AuthPage : ContentPage
         
            
            
-        
-        
     }
 
 

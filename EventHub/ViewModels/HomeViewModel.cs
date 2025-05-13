@@ -1,11 +1,6 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using EventHub.Data;
-using EventHub.Models;
-using EventHub.Services;
-using EventHub.Views.Event;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
+﻿
+
+
 
 namespace EventHub.ViewModels
 {
@@ -23,7 +18,7 @@ namespace EventHub.ViewModels
         [ObservableProperty]
         private bool _noEventsAvailable;
 
-        private bool _isInitialized;
+       
 
         [ObservableProperty]
         private string _name = "Stranger";
@@ -47,10 +42,7 @@ namespace EventHub.ViewModels
             _authService.UserLoggedOut += OnUserLoggedOut;
 
             MessagingCenter.Subscribe<SyncCoordinator>(
-                this,
-                "EventsUpdated",
-                async (sender) => await LoadRecentEventsAsync()
-            );
+                this, "EventsUpdated", async (sender) => await LoadRecentEventsAsync());
 
             // Load initial state
             LoadUserData();
@@ -90,16 +82,10 @@ namespace EventHub.ViewModels
             }
         }
 
-        public async Task InitializeAsync()
-        {
-            if (_isInitialized) return;
-            _isInitialized = true;
-
-            await LoadRecentEventsAsync();
-        }
+      
 
         [RelayCommand]
-        private async Task LoadRecentEventsAsync()
+        public async Task LoadRecentEventsAsync()
         {
             await RunBusyActionAsync(async () =>
             {
@@ -136,8 +122,6 @@ namespace EventHub.ViewModels
                 ["Event"] = selectedEvent
             });
         }
-
-
 
 
     }

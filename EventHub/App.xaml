@@ -11,7 +11,7 @@
                 <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <!--<converters:BoolToTextConverter x:Key="BoolToTextConverter"/>-->
+            
             <converters:FavoriteButtonTextConverter x:Key="FavoriteButtonTextConverter"/>
             <converters:FavoriteIconConverter x:Key="FavoriteIconConverter"/>
         </ResourceDictionary>

@@ -1,4 +1,4 @@
-using EventHub.ViewModels.Event;
+
 
 namespace EventHub.Views.Event;
 

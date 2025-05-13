@@ -1,4 +1,4 @@
-using EventHub.ViewModels.Event;
+
 
 namespace EventHub.Views.Event;
 
@@ -16,6 +16,6 @@ public partial class AllEventsPage : ContentPage
     {
         base.OnNavigatedTo(args);
         
-       await _allEventsViewModel.InitializeAsync();
+       await _allEventsViewModel.LoadAllEventsAsync();
     }
 }

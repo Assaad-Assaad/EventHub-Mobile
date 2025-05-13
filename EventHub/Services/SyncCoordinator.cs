@@ -1,11 +1,4 @@
-﻿using EventHub.Data;
-using EventHub.Shared.Dtos;
-using System.Diagnostics;
-using System.Net.Http.Json;
-using EventHub.Models;
-using EventHub.Utils;
-using System.Linq;
-using System.Text;
+﻿
 
 namespace EventHub.Services
 {
@@ -16,8 +9,7 @@ namespace EventHub.Services
         private readonly DatabaseContext _context;
         private readonly AuthService _authService;
         
-        private readonly SemaphoreSlim _syncLock = new SemaphoreSlim(1, 1);
-        private bool _isSyncing = false;
+       
 
 
         public SyncCoordinator(HttpClient httpClient, DatabaseContext context, AuthService authService)
@@ -116,9 +108,6 @@ namespace EventHub.Services
         }
 
 
-
-      
-
        public async Task SyncUserDataAsync()
         {
             try
@@ -145,13 +134,6 @@ namespace EventHub.Services
             {
                 Debug.WriteLine($"User sync error: {ex.Message}");
             }
-        }
-
-
-
-        private bool IsOnline()
-        {
-            return Connectivity.Current.NetworkAccess == NetworkAccess.Internet;
         }
 
 
@@ -212,6 +194,11 @@ namespace EventHub.Services
             {
                 Debug.WriteLine($"Error syncing favorites: {ex.Message}");
             }
+        }
+
+        private bool IsOnline()
+        {
+            return Connectivity.Current.NetworkAccess == NetworkAccess.Internet;
         }
     }
 }
