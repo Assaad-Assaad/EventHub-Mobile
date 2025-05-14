@@ -20,4 +20,8 @@ public partial class ProfilePage : ContentPage
         _profileViewModel.LoadUserData();
     }
 
+    private void PofileOptionRow_Focused(object sender, FocusEventArgs e)
+    {
+
+    }
 }

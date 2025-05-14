@@ -15,5 +15,6 @@
             <converters:FavoriteButtonTextConverter x:Key="FavoriteButtonTextConverter"/>
             <converters:FavoriteIconConverter x:Key="FavoriteIconConverter"/>
         </ResourceDictionary>
+        
     </Application.Resources>
 </Application>

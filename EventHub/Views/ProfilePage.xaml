@@ -13,7 +13,7 @@
 
     
 
-    <Grid RowDefinitions="Auto, *, Auto" RowSpacing="15">
+    <Grid RowDefinitions="Auto, *, Auto, Auto" RowSpacing="15">
         <!-- User Avatar -->
         <VerticalStackLayout Grid.Row="0" Spacing="5">
             <Border BackgroundColor="{StaticResource Primary}"
@@ -37,14 +37,31 @@
         </VerticalStackLayout>
 
         <!-- Profile Information -->
-        <VerticalStackLayout 
-            Grid.Row="1" 
-            Spacing="10" 
-            Padding="15">
-            <controls:PofileOptionRow Text="My Events"
-                                      />
-            <controls:PofileOptionRow Text="{Binding Name}" />
-            <controls:PofileOptionRow Text="{Binding Email}" />
+        <VerticalStackLayout Grid.Row="1" Spacing="10" Padding="15">
+            <controls:PofileOptionRow Text="My Events"/>
+            <HorizontalStackLayout Spacing="10">
+                <Image Source="id_card.png"
+                       HeightRequest="40"
+                       WidthRequest="40"
+                       VerticalOptions="Center"/>
+                <Label Text="{Binding Name}"
+                       FontSize="28"
+                       FontAttributes="Italic" 
+                       TextColor="{StaticResource Primary}"
+                       VerticalOptions="Center" />
+
+            </HorizontalStackLayout>
+            <HorizontalStackLayout Spacing="10">
+                <Image Source="mail.png"  
+                       HeightRequest="40"
+                       WidthRequest="40"
+                       VerticalOptions="Center" />
+                    <Label Text="{Binding Email}"
+                           FontSize="24"
+                           FontAttributes="Italic"
+                           TextColor="{StaticResource Primary}"
+                           VerticalOptions="Center" />
+            </HorizontalStackLayout>
 
         </VerticalStackLayout>
 
@@ -66,7 +83,14 @@
             </Button.Triggers>
         </Button>
 
-         
+        <Label Grid.Row="3"
+           Text="© 2025 Event Hub. Developed by Assaad Assaad."
+           FontSize="12"
+           TextColor="Gray"
+           HorizontalOptions="Center"
+           VerticalOptions="End" />
+
+
         <ActivityIndicator Grid.Row="0"
                            Grid.RowSpan="3"
                            IsRunning="{Binding IsBusy}"

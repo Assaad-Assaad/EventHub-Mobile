@@ -99,12 +99,12 @@ namespace EventHub.ViewModels
                     await Shell.Current.GoToAsync($"//{nameof(MyEventsPage)}");
                     break;
                 case "Name":
-                    // Handle name-related action
+                    
                     break;
                 case "Email":
-                    // Handle email-related action
+                    
                     break;
-                    // Add more cases as needed
+                    
             }
         }
 

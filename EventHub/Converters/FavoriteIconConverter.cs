@@ -8,7 +8,7 @@ namespace EventHub.Converters
         {
             if (value is bool isFavorite)
             {
-                return isFavorite ? "heart_filled.png" : "heart.png";
+                return isFavorite ? "heart_filled.png" : "heart_empty.png";
             }
             return "heart.png";
         }
