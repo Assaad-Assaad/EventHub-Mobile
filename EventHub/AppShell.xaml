@@ -13,7 +13,7 @@
    Shell.NavBarHasShadow="True"
    Shell.TabBarBackgroundColor="{StaticResource Primary}"
    Shell.TabBarForegroundColor="White"
-   Shell.TabBarTitleColor="White"
+   Shell.TabBarTitleColor="{AppThemeBinding Dark=White, Light=Black}"
    Shell.TabBarUnselectedColor="#EDEDED"
    Shell.BackgroundColor="{StaticResource Primary}"
    Shell.TitleColor="White"
@@ -25,13 +25,13 @@
     </Shell.Behaviors>
 
 
-    <!-- Auth Page -->
+    
     <ShellContent
         Title="Login"
         Route="AuthPage" 
         ContentTemplate="{DataTemplate views:AuthPage}"/>
 
-    <!-- TabBar for Main Pages -->
+    
     <TabBar>
         <ShellContent
             Title="Home"

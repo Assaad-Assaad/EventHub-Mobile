@@ -18,7 +18,7 @@
       Padding="10, 20, 10, 10"
       RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto">
 
-        <!-- ROW 0: Header -->
+        
         <FlexLayout Grid.Row="0" JustifyContent="SpaceBetween">
             <Border Background="White"
                 HeightRequest="30"
@@ -51,7 +51,7 @@
             </Border>
         </FlexLayout>
 
-        <!-- ROW 1: Circular Image -->
+        
         <Border Grid.Row="1"
             HeightRequest="250"
             WidthRequest="250"
@@ -65,7 +65,7 @@
                WidthRequest="250"/>
         </Border>
 
-        <!-- ROW 2: Title and Category -->
+        
         <Grid Grid.Row="2"
           RowDefinitions="Auto"
           ColumnDefinitions="*, Auto"
@@ -83,7 +83,7 @@
                VerticalOptions="Center"/>
         </Grid>
 
-        <!-- ROW 3: Description, Location, Date, and Button -->
+        
         <StackLayout Grid.Row="3"
                  Spacing="15"
                  Padding="10, 10, 10, 20"
@@ -121,7 +121,7 @@
                 Command="{Binding SignForCommand}"/>
         </VerticalStackLayout>
 
-        <!-- Activity Indicator -->
+        
         <ActivityIndicator HeightRequest="30"
                    WidthRequest="30"
                    HorizontalOptions="Center"

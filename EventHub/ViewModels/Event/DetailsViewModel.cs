@@ -88,6 +88,5 @@ namespace EventHub.ViewModels.Event
     }       
 
       
-
 }
 

@@ -10,30 +10,30 @@
              Title="All Events">
 
     <Grid RowDefinitions="Auto, Auto, *">
-        <!-- Search Bar -->
+        
         <SearchBar Grid.Row="0"
                Placeholder="Search by title..."
                Text="{Binding SearchText}"
                Margin="10"/>
 
-        <!-- Filters -->
+        
         <HorizontalStackLayout Grid.Row="1"
                            Spacing="10"
                            Padding="10">
-            <!-- Category Filter -->
+            
             <Picker Title="Category"
                 ItemsSource="{Binding Source={x:Static filter:CategoryFilters.All}}"
                 SelectedItem="{Binding SelectedCategory}"
                 WidthRequest="150"/>
 
-            <!-- Date Filter -->
+            
             <Picker Title="Sort by Date"
                 ItemsSource="{Binding Source={x:Static filter:DateFilters.All}}"
                 SelectedItem="{Binding SelectedDate}"
                 WidthRequest="200"/>
         </HorizontalStackLayout>
 
-        <!-- Event List with RefreshView -->
+        
         <RefreshView Grid.Row="2"
                  Command="{Binding LoadAllEventsCommand}"
                  IsRefreshing="{Binding IsBusy}">

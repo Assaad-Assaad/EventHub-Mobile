@@ -9,8 +9,9 @@ namespace EventHub
         {
             InitializeComponent();
             InitializeDatabase(context);
-            
             _authService = authService;
+
+            UserAppTheme = AppTheme.Light;
 
             // Initialize authentication and navigation
             MainThread.BeginInvokeOnMainThread(async () =>

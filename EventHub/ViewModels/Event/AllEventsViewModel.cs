@@ -78,11 +78,6 @@ namespace EventHub.ViewModels.Event
         }
 
 
-
-        
-
-
-
         partial void OnSearchTextChanged(string value)
         {
             LoadAllEventsCommand.Execute(null);

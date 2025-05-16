@@ -18,6 +18,6 @@ namespace EventHub.Shared.Dtos
 
         public bool IsSignedIn { get; set; }
 
-        public string Role { get; set; } = "Attendee";
+        public string Role { get; set; } = "User";
     }
 }

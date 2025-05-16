@@ -35,9 +35,7 @@ namespace EventHub.Api.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            
-            //modelBuilder.Entity<UserEvent>()
-            //    .HasKey(ue => new {ue.UserId, ue.EventId});
+        
         }
     }
 }

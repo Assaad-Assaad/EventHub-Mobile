@@ -65,7 +65,7 @@ namespace EventHub.Api.Services
         {
             var query = _context.Events.AsQueryable();
 
-            // Apply filters
+            
             if (!string.IsNullOrEmpty(title))
             {
                 query = query.Where(e => e.Title.ToLower().Contains(title.ToLower()));
@@ -81,7 +81,7 @@ namespace EventHub.Api.Services
                 query = query.Where(e => e.Date >= startDate.Value);
             }
 
-            // Apply sorting
+            
             switch (sortOrder?.ToLower())
             {
                 case "nearest":
@@ -91,11 +91,11 @@ namespace EventHub.Api.Services
                     query = query.OrderByDescending(e => e.Date);
                     break;
                 default:
-                    query = query.OrderBy(e => e.Date); // Default to nearest
+                    query = query.OrderBy(e => e.Date); 
                     break;
             }
 
-            // Map to DTOs and return
+            
             var events = await query
                 .Select(e => new EventDto
                 {

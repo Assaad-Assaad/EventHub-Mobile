@@ -34,16 +34,7 @@ namespace EventHub.Models
         public List<UserEvent> UserEvents { get; set; } = new List<UserEvent>();
 
 
-        
-
-
-
-
     }
 
 
-
-
-
-   
 }

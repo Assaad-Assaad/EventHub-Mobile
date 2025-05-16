@@ -11,9 +11,9 @@
 
     <Grid RowDefinitions="2*, 3*">
 
-        <!-- Header Section: Logo and Welcome Message -->
+        
         <VerticalStackLayout Grid.Row="0" Spacing="10" VerticalOptions="Center" HorizontalOptions="Center">
-            <!-- Circular Image with Shadow -->
+            
             <Border StrokeShape="RoundRectangle 150"
                 HeightRequest="200"
                 WidthRequest="200"
@@ -30,7 +30,6 @@
                 </Border.Shadow>
             </Border>
 
-            <!-- Welcome Text -->
             <Label Text="Welcome to Event Hub"
                FontSize="24"
                FontAttributes="Bold"
@@ -42,11 +41,11 @@
                TextColor="{StaticResource Primary}"/>
         </VerticalStackLayout>
 
-        <!-- Main Content: Login/Register Form -->
+        
         <ScrollView Grid.Row="1" Padding="15">
             <VerticalStackLayout Spacing="30">
 
-                <!-- Title and Mode Switch -->
+                
                 <Grid ColumnDefinitions="*, Auto">
                     <!-- Dynamic Title (Login/Register) -->
                     <Label Grid.Row="0" 
@@ -63,7 +62,7 @@
                         </Label.Triggers>
                     </Label>
 
-                    <!-- Mode Switch Link -->
+                    
                     <Label Grid.Column="1"
                        Text="Switch to Register"
                        VerticalOptions="Center"
@@ -85,30 +84,30 @@
                     </Label>
                 </Grid>
 
-                <!-- Input Fields -->
+                
                 <VerticalStackLayout Spacing="10">
 
-                    <!-- Name Field (Visible Only in Registration Mode) -->
+                    
                     <Entry Placeholder="Enter name"
                        Text="{Binding Name}"
                        PlaceholderColor="{StaticResource Primary}"
                        IsVisible="{Binding IsRegisteringMode}"/>
                     
 
-                    <!-- Email Field -->
+                    
                     <Entry Placeholder="Enter email"
                        Text="{Binding Email}"
                        PlaceholderColor="{StaticResource Primary}"
                        Keyboard="Email"/>
 
-                    <!-- Password Field -->
+                    
                     <Entry Placeholder="Enter password"
                        Text="{Binding Password}"
                        PlaceholderColor="{StaticResource Primary}"
                        IsPassword="True"/>
                 </VerticalStackLayout>
 
-                <!-- Submit Button (Login/Register) -->
+                
                 <Button Style="{StaticResource btnPrimary}" Text="Login"
                     Command="{Binding SubmitCommand}">
                     <Button.Triggers>
@@ -120,7 +119,7 @@
                     </Button.Triggers>
                 </Button>
 
-                <!-- Skip for Now Option -->
+                
                 <Grid ColumnDefinitions="*, Auto, *" ColumnSpacing="5">
                     <BoxView Grid.Column="0" 
                          HeightRequest="1" 
@@ -138,7 +137,7 @@
             </VerticalStackLayout>
         </ScrollView>
 
-        <!-- Activity Indicator -->
+        
         <ActivityIndicator HeightRequest="30"
                        WidthRequest="30"
                        HorizontalOptions="Center"

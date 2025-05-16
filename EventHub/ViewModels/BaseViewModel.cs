@@ -10,10 +10,7 @@ namespace EventHub.ViewModels
 
 
 
-        public BaseViewModel()
-        {
-            
-        }
+        public BaseViewModel(){}
 
         protected async Task RunBusyActionAsync(Func<Task> action, string errorMessage = "Something went wrong.", bool requireOnline = false)
         {
@@ -33,7 +30,7 @@ namespace EventHub.ViewModels
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"❌ {errorMessage}: {ex.Message}");
+                Debug.WriteLine($" {errorMessage}: {ex.Message}");
                 await ShowAlertAsync("Error", errorMessage, "OK");
             }
             finally

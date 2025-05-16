@@ -136,7 +136,7 @@ namespace EventHub.Data
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"❌ Failed to get last sync time: {ex.Message}");
+                Debug.WriteLine($"Failed to get last sync time: {ex.Message}");
                 return null;
             }
         }
@@ -146,12 +146,12 @@ namespace EventHub.Data
             try
             {
                 await Database.InsertOrReplaceAsync(new SyncHistory { SyncDate = syncTime });
-                Debug.WriteLine($"✅ Sync time updated to: {syncTime}");
+                Debug.WriteLine($"Sync time updated to: {syncTime}");
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"❌ Failed to update sync time: {ex.Message}");
-                Debug.WriteLine($"❌ Stack Trace: {ex.StackTrace}");
+                Debug.WriteLine($"Failed to update sync time: {ex.Message}");
+                
             }
         }
     }

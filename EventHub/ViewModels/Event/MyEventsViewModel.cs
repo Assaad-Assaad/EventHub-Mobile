@@ -28,7 +28,6 @@ namespace EventHub.ViewModels.Event
             _userEventService = userEventService;
             _eventsService = eventsService;
 
-
         }
 
 

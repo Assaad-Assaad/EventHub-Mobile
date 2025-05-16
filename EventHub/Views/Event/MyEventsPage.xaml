@@ -83,7 +83,7 @@
 
                             </Border>
 
-                            <!-- Left swipe actions -->
+                            
                             <SwipeView.LeftItems>
                                 <SwipeItems Mode="Execute">
                                     <SwipeItem Text="Sign Up"
@@ -94,7 +94,7 @@
                                 </SwipeItems>
                             </SwipeView.LeftItems>
 
-                            <!-- Right swipe actions -->
+                            
                             <SwipeView.RightItems>
                                 <SwipeItems Mode="Execute">
                                     <SwipeItem Text="Delete"

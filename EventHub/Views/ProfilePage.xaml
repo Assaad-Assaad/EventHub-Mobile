@@ -14,7 +14,7 @@
     
 
     <Grid RowDefinitions="Auto, *, Auto, Auto" RowSpacing="15">
-        <!-- User Avatar -->
+        
         <VerticalStackLayout Grid.Row="0" Spacing="5">
             <Border BackgroundColor="{StaticResource Primary}"
                     HeightRequest="100"
@@ -36,7 +36,7 @@
                    TextColor="{StaticResource Primary}" />
         </VerticalStackLayout>
 
-        <!-- Profile Information -->
+        
         <VerticalStackLayout Grid.Row="1" Spacing="10" Padding="15">
             <controls:PofileOptionRow Text="My Events"/>
             <HorizontalStackLayout Spacing="10">
