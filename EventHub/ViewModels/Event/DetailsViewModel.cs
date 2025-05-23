@@ -37,8 +37,12 @@ namespace EventHub.ViewModels.Event
                 if (SelectedEvent == null) return;
                 if (_authService.CurrentUser == null)
                 {
-                    await Shell.Current.DisplayAlert("Error", "Please log in to favorite events", "OK");
-                    await Shell.Current.GoToAsync($"//{nameof(AuthPage)}");
+                    bool shouldNavigate = await ShowConfirmAsync("Error", "Please log in to sign up for events", "OK", "Cancel");
+                    if (shouldNavigate)
+                    {
+                        await Shell.Current.GoToAsync($"//{nameof(AuthPage)}");
+                    }
+
                     return;
                 }
                 
@@ -74,8 +78,12 @@ namespace EventHub.ViewModels.Event
                 if (SelectedEvent == null) return;
                 if (_authService.CurrentUser == null)
                 {
-                    await Shell.Current.DisplayAlert("Error", "Please log in to sign up for events", "OK");
-                    await Shell.Current.GoToAsync($"//{nameof(AuthPage)}");
+                  bool shouldNavigate = await ShowConfirmAsync("Error", "Please log in to sign up for events", "OK", "Cancel");
+                    if (shouldNavigate)
+                    {
+                        await Shell.Current.GoToAsync($"//{nameof(AuthPage)}");
+                    }
+                        
                     return;
                 }
                 // here I just want to show a thank you message i do not want to make any changes to the database
