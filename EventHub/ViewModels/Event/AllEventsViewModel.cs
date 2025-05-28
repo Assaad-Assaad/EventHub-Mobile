@@ -3,6 +3,8 @@
 
 
 
+
+
 namespace EventHub.ViewModels.Event
 {
     public partial class AllEventsViewModel : BaseViewModel
@@ -25,6 +27,8 @@ namespace EventHub.ViewModels.Event
         private string _selectedDate;
 
         
+
+
 
         public AllEventsViewModel(EventsService eventsService, SyncCoordinator syncCoordinator)
         {
@@ -92,6 +96,9 @@ namespace EventHub.ViewModels.Event
         {
             LoadAllEventsCommand.Execute(null);
         }
+
+
+    
     }
 
 }

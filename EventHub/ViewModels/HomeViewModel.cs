@@ -7,7 +7,7 @@ namespace EventHub.ViewModels
     public partial class HomeViewModel : BaseViewModel
     {
         private readonly EventsService _eventService;
-        private readonly SyncCoordinator _syncCoordinator;  
+        private readonly SyncCoordinator _syncCoordinator;
         private readonly AuthService _authService;
         private readonly DatabaseContext _context;
         private readonly UserEventService _userEventService;
@@ -18,7 +18,9 @@ namespace EventHub.ViewModels
         [ObservableProperty]
         private bool _noEventsAvailable;
 
-       
+        
+
+
 
         [ObservableProperty]
         private string _name = "Stranger";
@@ -26,7 +28,7 @@ namespace EventHub.ViewModels
         public ObservableCollection<Models.Event> RecentEvents { get; } = new();
 
         public HomeViewModel(DatabaseContext context,
-                            EventsService eventService, 
+                            EventsService eventService,
                             SyncCoordinator syncCoordinator,
                             AuthService authService,
                             UserEventService userEventService)
@@ -37,7 +39,7 @@ namespace EventHub.ViewModels
             _context = context;
             _userEventService = userEventService;
 
-            
+
             _authService.UserLoggedIn += OnUserLoggedIn;
             _authService.UserLoggedOut += OnUserLoggedOut;
 
@@ -82,7 +84,7 @@ namespace EventHub.ViewModels
             }
         }
 
-      
+
 
         [RelayCommand]
         public async Task LoadRecentEventsAsync()
@@ -124,5 +126,6 @@ namespace EventHub.ViewModels
         }
 
 
+       
     }
 }
